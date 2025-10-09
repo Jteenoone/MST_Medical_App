@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.PatientsController" stylesheets="">
+    <children>
+        <HBox spacing="8.0">
+            <TextField fx:id="searchField" promptText="Tìm theo tên hoặc SĐT" HBox.hgrow="ALWAYS" />
+            <Button text="Tìm" fx:id="searchButton" />
+            <Button text="Thêm" fx:id="addButton" />
+            <Button text="Sửa" fx:id="editButton" />
+            <Button text="Xóa" fx:id="deleteButton" />
+        </HBox>
+        <TableView fx:id="patientsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idCol" text="ID" prefWidth="60" />
+                <TableColumn fx:id="nameCol" text="Họ tên" prefWidth="240" />
+                <TableColumn fx:id="dobCol" text="Ngày sinh" prefWidth="120" />
+                <TableColumn fx:id="genderCol" text="Giới tính" prefWidth="90" />
+                <TableColumn fx:id="phoneCol" text="SĐT" prefWidth="140" />
+                <TableColumn fx:id="addressCol" text="Địa chỉ" prefWidth="260" />
+            </columns>
+        </TableView>
+    </children>
+</VBox>

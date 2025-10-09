@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.AssistantController">
+    <children>
+        <TextArea fx:id="chatArea" editable="false" promptText="Trợ lý AI (cơ bản)" VBox.vgrow="ALWAYS"/>
+        <HBox spacing="8.0">
+            <TextField fx:id="userInput" HBox.hgrow="ALWAYS" promptText="Nhập câu hỏi..."/>
+            <Button text="Gửi" fx:id="sendBtn" />
+        </HBox>
+    </children>
+</VBox>

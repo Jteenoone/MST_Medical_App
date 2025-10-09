@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane hgap="8.0" vgap="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.AppointmentFormController" padding="10">
+    <columnConstraints>
+        <ColumnConstraints halignment="RIGHT" prefWidth="140"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <children>
+        <Label text="Mã bệnh nhân:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="patientIdField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Ngày hẹn:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="datePicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Giờ (HH:mm):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="timeField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Bác sĩ:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="doctorField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Lý do:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="reasonField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Trạng thái:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="statusCombo" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <HBox spacing="8.0" alignment="CENTER_RIGHT" GridPane.rowIndex="6" GridPane.columnIndex="1">
+            <Button fx:id="saveBtn" text="Lưu"/>
+            <Button fx:id="cancelBtn" text="Hủy"/>
+        </HBox>
+    </children>
+</GridPane>

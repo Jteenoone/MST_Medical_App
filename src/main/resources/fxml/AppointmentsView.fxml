@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.AppointmentsController">
+    <children>
+        <HBox spacing="8.0">
+            <DatePicker fx:id="fromDate" promptText="Từ ngày" />
+            <DatePicker fx:id="toDate" promptText="Đến ngày" />
+            <Button text="Lọc" fx:id="filterButton" />
+            <Button text="Thêm" fx:id="addButton" />
+            <Button text="Sửa" fx:id="editButton" />
+            <Button text="Xóa" fx:id="deleteButton" />
+        </HBox>
+        <TableView fx:id="appointmentsTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idCol" text="ID" prefWidth="60" />
+                <TableColumn fx:id="patientIdCol" text="Mã BN" prefWidth="80" />
+                <TableColumn fx:id="timeCol" text="Thời gian" prefWidth="200" />
+                <TableColumn fx:id="doctorCol" text="Bác sĩ" prefWidth="180" />
+                <TableColumn fx:id="reasonCol" text="Lý do" prefWidth="240" />
+                <TableColumn fx:id="statusCol" text="Trạng thái" prefWidth="120" />
+            </columns>
+        </TableView>
+    </children>
+</VBox>

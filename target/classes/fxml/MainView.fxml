@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.MainController">
+    <top>
+        <MenuBar>
+            <menus>
+                <Menu text="Tệp">
+                    <items>
+                        <MenuItem text="Thoát" fx:id="exitMenuItem" />
+                    </items>
+                </Menu>
+                <Menu text="Trợ giúp">
+                    <items>
+                        <MenuItem text="Giới thiệu" fx:id="aboutMenuItem" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+    <center>
+        <TabPane fx:id="mainTabPane">
+            <tabs>
+                <Tab text="Bệnh nhân" closable="false">
+                    <content>
+                        <fx:include source="PatientsView.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Lịch hẹn" closable="false">
+                    <content>
+                        <fx:include source="AppointmentsView.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Bệnh án" closable="false">
+                    <content>
+                        <fx:include source="RecordsView.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Báo cáo" closable="false">
+                    <content>
+                        <fx:include source="ReportsView.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Trợ lý AI" closable="false">
+                    <content>
+                        <fx:include source="AssistantView.fxml" />
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

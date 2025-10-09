@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane hgap="8.0" vgap="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.PatientFormController" padding="10">
+    <columnConstraints>
+        <ColumnConstraints halignment="RIGHT" prefWidth="120"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <children>
+        <Label text="Họ tên:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Ngày sinh:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="dobPicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Giới tính:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="genderField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="SĐT:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="phoneField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Địa chỉ:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="addressField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <HBox spacing="8.0" alignment="CENTER_RIGHT" GridPane.rowIndex="5" GridPane.columnIndex="1">
+            <Button fx:id="saveBtn" text="Lưu"/>
+            <Button fx:id="cancelBtn" text="Hủy"/>
+        </HBox>
+    </children>
+</GridPane>

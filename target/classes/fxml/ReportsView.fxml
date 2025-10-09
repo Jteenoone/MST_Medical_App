@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.clinic.controllers.ReportsController">
+    <children>
+        <HBox spacing="8.0">
+            <Button text="Xuất CSV bệnh nhân" fx:id="exportPatientsBtn" />
+            <Button text="Xuất CSV lịch hẹn" fx:id="exportAppointmentsBtn" />
+        </HBox>
+        <TextArea fx:id="logArea" promptText="Nhật ký xuất báo cáo..." prefRowCount="10"/>
+    </children>
+</VBox>
