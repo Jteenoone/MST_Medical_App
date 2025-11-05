@@ -14,7 +14,10 @@ public class ChatConversationItemController {
     @FXML private Label lastMsgLbl;
     @FXML private Label timeLbl;
 
+    private String userName;
+
     public void setData(String name, String avatarPath, String lastMsg, String time) {
+        this.userName = name;
         nameLbl.setText(name);
         lastMsgLbl.setText(lastMsg);
         timeLbl.setText(time);
@@ -22,9 +25,12 @@ public class ChatConversationItemController {
         try {
             avatarImg.setImage(new Image(getClass().getResourceAsStream(avatarPath)));
         } catch (Exception e) {
-            System.out.println("Avatar not found -> using default");
             avatarImg.setImage(new Image(getClass().getResourceAsStream("/images/default_avatar.png")));
         }
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public void setSelected(boolean selected) {

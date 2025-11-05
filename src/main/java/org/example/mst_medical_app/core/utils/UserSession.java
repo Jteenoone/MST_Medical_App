@@ -1,24 +1,47 @@
 package org.example.mst_medical_app.core.utils;
 
-public class UserSession {
-    private static String role;
-    private  static String username;
+import org.example.mst_medical_app.model.UserModel;
 
-    public static void setUser(String username, String role) {
-        UserSession.role = role;
-        UserSession.username = username;
+public class UserSession {
+
+
+    private static UserModel currentUser;
+
+
+    public static void setUser(UserModel user) {
+        currentUser = user;
+    }
+
+
+    public static UserModel getUser() {
+        return currentUser;
+    }
+
+
+    public static int getCurrentUserId() {
+        return (currentUser != null) ? currentUser.getId() : 0;
     }
 
     public static String getRole() {
-        return role;
+        return (currentUser != null) ? currentUser.getRole() : null;
+    }
+
+    public static String getUsername() {
+        return (currentUser != null) ? currentUser.getUsername() : null;
     }
 
     public static boolean isAdmin() {
-        return "ADMIN".equals(role);
+        return "Admin".equalsIgnoreCase(getRole());
+    }
+
+    public static boolean isDoctor() {
+        return "Doctor".equalsIgnoreCase(getRole());
     }
 
     public static boolean isPatient() {
-        return "PATIENT".equals(role);
+        return "Patient".equalsIgnoreCase(getRole());
     }
-    public static boolean isDoctor() {return "DOCTOR".equals(role);}
+    public static void clear() {
+        currentUser = null;
+    }
 }

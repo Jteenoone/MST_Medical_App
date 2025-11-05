@@ -145,6 +145,33 @@ CREATE TABLE user_settings (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+
+-- Chat
+
+CREATE TABLE conversations (
+    conversation_id INT PRIMARY KEY AUTO_INCREMENT,
+    user1_id INT NOT NULL,
+    user2_id INT NOT NULL,
+    last_message TEXT,
+    last_message_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user1_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (user2_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_conversation_pair (user1_id, user2_id)
+);
+
+
+CREATE TABLE messages (
+    message_id INT PRIMARY KEY AUTO_INCREMENT,
+    conversation_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    content TEXT NOT NULL,
+    sent_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+
+
 -- =========================
 -- 13. DỮ LIỆU MẪU CƠ BẢN
 -- =========================
@@ -184,7 +211,7 @@ SELECT user_id, '1995-05-15', 'Male', '123 Trần Phú, Hà Đông, Hà Nội'
 FROM users WHERE username = 'patient1';
 
 -- =========================
--- 14. DỮ LIỆU MỞ RỘNG (HÀ NỘI)
+-- 14. DỮ LIỆU MỞ RỘNG
 -- =========================
 
 -- Thêm Users
@@ -242,6 +269,20 @@ INSERT INTO prescription_items (prescription_id, medicine_name, dosage, duration
 SELECT p.prescription_id, 'Paracetamol', '500mg', '3 ngày'
 FROM prescriptions p JOIN appointments a ON p.appointment_id=a.appointment_id
 WHERE a.appointment_time='2025-11-02 10:15:00';
+
+-- Tạo cuộc hội thoại giữa bác sĩ và bệnh nhân
+INSERT INTO conversations (user1_id, user2_id, last_message, last_message_time)
+VALUES
+((SELECT user_id FROM users WHERE username='doctor1'),
+ (SELECT user_id FROM users WHERE username='patient2'),
+ 'Xin chào bác sĩ', NOW());
+
+-- Thêm tin nhắn mẫu
+INSERT INTO messages (conversation_id, sender_id, content)
+VALUES
+(1, (SELECT user_id FROM users WHERE username='patient2'), 'Xin chào bác sĩ'),
+(1, (SELECT user_id FROM users WHERE username='doctor1'), 'Chào bạn, bạn đang gặp vấn đề gì?');
+
 
 -- Logs
 INSERT INTO activity_logs (user_id, activity_type, description)

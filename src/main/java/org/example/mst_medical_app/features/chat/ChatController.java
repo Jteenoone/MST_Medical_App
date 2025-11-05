@@ -8,7 +8,20 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.example.mst_medical_app.core.database.DatabaseConnection;
+import org.example.mst_medical_app.core.utils.UserSession;
+import org.example.mst_medical_app.model.chat.Conversation;
+import org.example.mst_medical_app.model.chat.Message;
+
 public class ChatController {
+
+    private ChatDAO chatDAO;
+    private int currentUserId;           // id người đang đăng nhập
+    private int currentConversationId;   // id cuộc trò chuyện hiện tại
 
     // LEFT SIDE
     @FXML private TextField searchField;
@@ -33,20 +46,50 @@ public class ChatController {
 
     @FXML
     public void initialize() {
-        loadSampleConversations();
-        setupSendMessage();
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            chatDAO = new ChatDAO(conn);
+
+            // Lấy user ID từ session
+            currentUserId = UserSession.getCurrentUserId();
+            if (currentUserId == 0) {
+                System.out.println("Không có user đăng nhập — tạm set userId = 1 để test.");
+                currentUserId = 1; // fallback cho debug
+            }
+
+            loadConversationsFromDB();
+            setupSendMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    /** -------------------------
-     *  LOAD SAMPLE CONVERSATIONS (UI DEMO ONLY)
-     *  ------------------------- */
-    private void loadSampleConversations() {
-        addConversationItem("Dr. Toan Nghiem","/images/doctor1.png", "See you tomorrow", "14:32");
-        addConversationItem("Dr. San Nguyen", "/images/doctor2.png","Send me your results", "09:12");
-        addConversationItem("Dr. DT", "/images/doctor 3.png","Okay thank you!", "Yesterday");
+
+    private void loadConversationsFromDB() {
+        conversationList.getChildren().clear();
+        try {
+            List<Conversation> list = chatDAO.getConversationsByUser(currentUserId);
+
+            for (Conversation c : list) {
+                String otherName = c.getOtherUserName();
+                addConversationItem(
+                        c.getId(),
+                        otherName,
+                        "/images/doctor1.png",
+                        c.getLastMessage(),
+                        c.getLastMessageTime() != null
+                                ? c.getLastMessageTime().toString()
+                                : ""
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void addConversationItem(String name, String avatarPath, String lastMsg, String time) {
+
+    private void addConversationItem(int conversationId, String name, String avatarPath, String lastMsg, String time) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatConversationItem.fxml"));
             HBox item = loader.load();
@@ -54,7 +97,7 @@ public class ChatController {
             ChatConversationItemController controller = loader.getController();
             controller.setData(name, avatarPath, lastMsg, time);
 
-            item.setOnMouseClicked(e -> openChat(name, avatarPath));
+            item.setOnMouseClicked(e -> openChat(conversationId, name, avatarPath));
 
             conversationList.getChildren().add(item);
         } catch (Exception e) {
@@ -63,10 +106,8 @@ public class ChatController {
     }
 
 
-    /** -------------------------
-     *  OPEN CHAT (UI ONLY)
-     *  ------------------------- */
-    private void openChat(String user, String avatarPath) {
+    private void openChat(int conversationId, String user, String avatarPath) {
+        currentConversationId = conversationId;
         currentChatUser = user;
 
         chatName.setText(user);
@@ -79,12 +120,22 @@ public class ChatController {
         }
 
         messageContainer.getChildren().clear();
+
+        // Load messages from DB
+        try {
+            List<Message> messages = chatDAO.getMessages(conversationId);
+            for (Message m : messages) {
+                boolean isSender = (m.getSenderId() == currentUserId);
+                addMessageBubble(m.getContent(), isSender);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        scrollToBottom();
     }
 
 
-    /** -------------------------
-     *  SEND MESSAGE (UI ONLY)
-     *  ------------------------- */
     private void setupSendMessage() {
         sendBtn.setOnAction(e -> sendMessage());
         messageField.setOnAction(e -> sendMessage()); // Enter key
@@ -94,17 +145,26 @@ public class ChatController {
         String msg = messageField.getText().trim();
         if (msg.isEmpty() || currentChatUser == null) return;
 
+        // Hiển thị ngay trên UI
         addMessageBubble(msg, true);
         messageField.clear();
-
         scrollToBottom();
 
-        // Phase 2 sẽ thêm: Save DB + refresh receiver
+        // Lưu vào DB
+        try {
+            Message message = new Message();
+            message.setConversationId(currentConversationId);
+            message.setSenderId(currentUserId);
+            message.setContent(msg);
+
+            chatDAO.sendMessage(message);
+            System.out.println("Đã lưu tin nhắn vào DB!");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    /** -------------------------
-     *  ADD CHAT BUBBLE UI
-     *  ------------------------- */
     private void addMessageBubble(String message, boolean isSender) {
         Label bubble = new Label(message);
         bubble.setWrapText(true);

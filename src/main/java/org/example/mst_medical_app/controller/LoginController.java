@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.example.mst_medical_app.core.security.AuthManager;
 import org.example.mst_medical_app.core.utils.SceneManager;
+import org.example.mst_medical_app.core.utils.UserSession;
 import org.example.mst_medical_app.model.UserModel;
 import org.example.mst_medical_app.model.UserRepository;
 
@@ -32,6 +33,7 @@ public class LoginController {
 
         // Đăng nhập thành công
         AuthManager.login(user);
+        UserSession.setUser(user);
         showMessage("Đăng nhập thành công (" + user.getRole() + ")", "green");
 
         // Chuyển scene theo role
