@@ -23,7 +23,6 @@
 
         <Button fx:id="nextBtn" text="▶"/>
 
-        <!-- Toggle Buttons (ToggleGroup will be assigned in Controller) -->
         <ToggleButton fx:id="dayBtn" text="Day"/>
         <ToggleButton fx:id="weekBtn" text="Week"/>
         <ToggleButton fx:id="monthBtn" text="Month" selected="true"/>

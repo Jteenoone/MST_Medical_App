@@ -22,7 +22,7 @@ public class ChatConversationItemController {
         try {
             avatarImg.setImage(new Image(getClass().getResourceAsStream(avatarPath)));
         } catch (Exception e) {
-            System.out.println("⚠ Avatar not found -> using default");
+            System.out.println("Avatar not found -> using default");
             avatarImg.setImage(new Image(getClass().getResourceAsStream("/images/default_avatar.png")));
         }
     }

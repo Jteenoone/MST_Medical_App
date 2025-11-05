@@ -34,7 +34,7 @@ public class MainLayoutController {
                 setContent("/org/example/mst_medical_app/doctor/DoctorDashboardView.fxml");
             }
             else {
-                System.err.println("⚠️ Không xác định được role để load Dashboard!");
+                System.err.println("Không xác định được role để load Dashboard!");
             }
         });
     }
