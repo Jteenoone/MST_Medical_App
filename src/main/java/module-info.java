@@ -3,6 +3,7 @@ module org.example.mst_medical_app {
     requires javafx.fxml;
     requires javafx.graphics;
     requires java.sql;
+    requires jbcrypt;
 
     opens org.example.mst_medical_app to javafx.fxml;
     exports org.example.mst_medical_app;

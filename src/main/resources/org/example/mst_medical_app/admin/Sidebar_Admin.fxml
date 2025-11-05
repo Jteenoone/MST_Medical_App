@@ -10,6 +10,7 @@
 <VBox prefWidth="250" spacing="140" stylesheets="@../../../../styles/sidebar.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.mst_medical_app.controller.admin.SidebarAdminController">
 
 
+
     <!-- Menu Items -->
     <VBox spacing="8">
 

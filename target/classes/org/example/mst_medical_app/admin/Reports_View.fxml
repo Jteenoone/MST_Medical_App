@@ -1,41 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.PieChart?>
-<?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox maxWidth="Infinity" maxHeight="Infinity" xmlns="http://javafx.com/javafx/25"
+<VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.mst_medical_app.controller.admin.ReportsController"
-      spacing="20" alignment="TOP_CENTER"
-      style="-fx-padding: 20;" VBox.vgrow = "ALWAYS">
+      spacing="25" alignment="TOP_CENTER"
+      style="-fx-padding: 20; -fx-background-color: #f9fafb;"
+      VBox.vgrow="ALWAYS">
 
+    <!-- Tiêu đề -->
+    <Label text="📊 BÁO CÁO THỐNG KÊ HỆ THỐNG"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
 
-    <Label text="📊 Báo cáo thống kê hệ thống"
-           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-
-
-    <HBox spacing="30" alignment="CENTER" >
-        <PieChart fx:id="pieChart" title="Tỉ lệ cuộc hẹn theo trạng thái" prefWidth="750" prefHeight="650"/>
-
-        <BarChart fx:id="barChart" prefWidth="750" prefHeight="650">
-            <xAxis>
-                <CategoryAxis label="Tháng"/>
-            </xAxis>
-            <yAxis>
-                <NumberAxis label="Số lượng"/>
-            </yAxis>
-        </BarChart>
-    </HBox>
-
-
+    <!-- Hai biểu đồ tròn: Trạng thái & Giới tính -->
     <HBox spacing="40" alignment="CENTER">
-        <Label fx:id="totalPatientsLabel" text="Tổng bệnh nhân: 0" style="-fx-font-size: 16px;"/>
-        <Label fx:id="totalAppointmentsLabel" text="Tổng cuộc hẹn: 0" style="-fx-font-size: 16px;"/>
-        <Label fx:id="totalRevenueLabel" text="Doanh thu: 0đ" style="-fx-font-size: 16px;"/>
+        <PieChart fx:id="pieChartStatus"
+                  title="Tỉ lệ cuộc hẹn theo trạng thái"
+                  prefWidth="500" prefHeight="400"/>
+
+        <PieChart fx:id="pieChartGender"
+                  title="Tỉ lệ giới tính bệnh nhân"
+                  prefWidth="500" prefHeight="400"/>
     </HBox>
+
+    <!-- Biểu đồ cột -->
+    <BarChart fx:id="barChart" prefWidth="1050" prefHeight="450"
+              style="-fx-background-color: white; -fx-border-radius: 8; -fx-background-radius: 8;">
+        <xAxis>
+            <CategoryAxis label="Tháng"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="Số lượng lịch hẹn"/>
+        </yAxis>
+    </BarChart>
+
+    <!-- Chỉ số tổng -->
+    <HBox spacing="60" alignment="CENTER">
+        <Label fx:id="totalPatientsLabel" text="👥 Tổng bệnh nhân: 0"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        <Label fx:id="totalAppointmentsLabel" text="📅 Tổng cuộc hẹn: 0"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        <Label fx:id="totalRevenueLabel" text="💰 Doanh thu: 0 đ"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+    </HBox>
+
 </VBox>

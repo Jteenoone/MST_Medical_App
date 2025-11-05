@@ -1,5 +1,6 @@
 package org.example.mst_medical_app.controller.admin;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,69 +10,96 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import org.example.mst_medical_app.model.Patient;
+import org.example.mst_medical_app.service.AppointmentService;
+import org.example.mst_medical_app.service.ReportService;
+import org.example.mst_medical_app.service.PatientService;
+import java.util.stream.Collectors;
 
+/**
+ * Controller cho Admin Dashboard
+ */
 public class AdminDashboardController {
 
     @FXML private Label patientCountLabel, prescriptionCountLabel, appointmentCountLabel, revenueLabel;
     @FXML private LineChart<String, Number> patientLineChart;
     @FXML private PieChart patientPieChart;
     @FXML private TableView<Patient> recentPatientTable;
-    @FXML private TableColumn<Patient, String> nameColumn, genderColumn, doctorColumn, statusColumn;
-    @FXML private TableColumn<Patient, Integer> ageColumn;
+    @FXML private TableColumn<Patient, String> nameColumn, genderColumn, doctorColumn, addressColumn, dobColumn;
+
+    private ReportService reportService;
+    private PatientService patientService;
+    private AppointmentService appointmentService;
 
     @FXML
     public void initialize() {
+        // 1. Khởi tạo Service
+        this.reportService = new ReportService();
+        this.patientService = new PatientService();
+        this.appointmentService = new AppointmentService();
 
+        // 2. Tải dữ liệu
+        loadKpis();
+        loadPatientLineChart();
+        loadPatientPieChart();
+        loadRecentPatientTable();
+    }
+
+    /**
+     * Tải các KPI từ ReportService
+     */
+    private void loadKpis() {
+        int[] kpiCounts = reportService.getDashboardKpiCounts();
+
+        patientCountLabel.setText(String.valueOf(kpiCounts[0]));
+        prescriptionCountLabel.setText(String.valueOf(kpiCounts[1]));
+        appointmentCountLabel.setText(String.valueOf(kpiCounts[2]));
+        revenueLabel.setText("58.000.000đ");
+    }
+
+    /**
+     * Tải biểu đồ Line (thống kê bệnh nhân)
+     */
+    private void loadPatientLineChart() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Patients 2025");
         series.getData().add(new XYChart.Data<>("Jan", 120));
         series.getData().add(new XYChart.Data<>("Feb", 135));
-        series.getData().add(new XYChart.Data<>("Mar", 160));
-        series.getData().add(new XYChart.Data<>("Apr", 180));
-        series.getData().add(new XYChart.Data<>("May", 210));
+        series.getData().add(new XYChart.Data<>("Mar", 150));
+        series.getData().add(new XYChart.Data<>("Apr", 160));
         patientLineChart.getData().add(series);
-
-
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
-                new PieChart.Data("Male", 60),
-                new PieChart.Data("Female", 40)
-        );
-        patientPieChart.setData(pieData);
-
-
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
-        genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
-        doctorColumn.setCellValueFactory(new PropertyValueFactory<>("doctor"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-
-        recentPatientTable.setItems(FXCollections.observableArrayList(
-                new Patient("San Nguyen", 25, "Female", "Dr. Olivia Grant", "Completed"),
-                new Patient("Nghiem Toan", 32, "Male", "Dr. Carter", "Pending"),
-                new Patient("Tuan Tran", 29, "Female", "Dr. Emily Ross", "Confirmed")
-        ));
     }
 
-    public static class Patient {
-        private final String name;
-        private final int age;
-        private final String gender;
-        private final String doctor;
-        private final String status;
+    /**
+     * Tải biểu đồ Pie (giới tính bệnh nhân)
+     */
+    private void loadPatientPieChart() {
+        ObservableList<PieChart.Data> pieData = reportService.getPatientGenderDashboard();
+        patientPieChart.setData(pieData);
+    }
 
-        public Patient(String name, int age, String gender, String doctor, String status) {
-            this.name = name;
-            this.age = age;
-            this.gender = gender;
-            this.doctor = doctor;
-            this.status = status;
+    /**
+     * Tải bảng Bệnh nhân gần đây
+     */
+    private void loadRecentPatientTable() {
+        nameColumn.setCellValueFactory(data -> data.getValue().fullNameProperty());
+        genderColumn.setCellValueFactory(data -> data.getValue().genderProperty());
+        addressColumn.setCellValueFactory(data -> data.getValue().addressProperty());
+        dobColumn.setCellValueFactory(data -> {
+            if (data.getValue().getDateOfBirth() != null)
+                return new ReadOnlyStringWrapper(data.getValue().getDateOfBirth().toString());
+            else
+                return new ReadOnlyStringWrapper("-");
+        });
+        doctorColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper("N/A"));
+
+        ObservableList<Patient> allPatients = patientService.getAllPatients();
+        ObservableList<Patient> recentPatients = FXCollections.observableArrayList();
+
+        if (allPatients != null) {
+            recentPatients.addAll(allPatients.stream().limit(5).collect(Collectors.toList()));
         }
 
-        public String getName() { return name; }
-        public int getAge() { return age; }
-        public String getGender() { return gender; }
-        public String getDoctor() { return doctor; }
-        public String getStatus() { return status; }
+        recentPatientTable.setItems(recentPatients);
     }
 }

@@ -14,17 +14,6 @@
       spacing="150"
       stylesheets="@../../../../styles/sidebar.css">
 
-    <!-- Logo -->
-<!--    <ImageView fitHeight="60" fitWidth="60" preserveRatio="true">-->
-<!--        <image>-->
-<!--            <Image url="@../../../../images/medical_icon.png" />-->
-<!--        </image>-->
-<!--        <VBox.margin>-->
-<!--            <Insets left="20" />-->
-<!--        </VBox.margin>-->
-<!--    </ImageView>-->
-
-    <!-- Menu Items -->
     <VBox spacing="10">
 
         <HBox fx:id="overviewItem" styleClass="sidebar-item">

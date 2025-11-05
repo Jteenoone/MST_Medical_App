@@ -1,14 +1,17 @@
 package org.example.mst_medical_app.controller.patient;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.*;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import org.example.mst_medical_app.controller.MainLayoutController;
 import org.example.mst_medical_app.model.Appointment;
-import org.example.mst_medical_app.model.AppointmentRepository;
+import org.example.mst_medical_app.service.AppointmentService;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+
 
 public class PatientDashboardController {
 
@@ -19,6 +22,7 @@ public class PatientDashboardController {
     @FXML private Button viewAllAppointmentsBtn;
 
     private MainLayoutController mainLayoutController;
+    private final AppointmentService appointmentService = new AppointmentService();
 
     public void setMainLayoutController(MainLayoutController controller) {
         this.mainLayoutController = controller;
@@ -30,12 +34,14 @@ public class PatientDashboardController {
         loadAppointments();
         loadHealthChart();
 
+        // Gắn sự kiện cho nút xem tất cả cuộc hẹn
         viewAllAppointmentsBtn.setOnAction(e -> {
             if (mainLayoutController != null) {
-                mainLayoutController.setContent("/org/example/mst_medical_app/admin/Appointments_View.fxml");
+                mainLayoutController.setContent("/org/example/mst_medical_app/admin/Appointments_Calendar_View.fxml");
             }
         });
     }
+
 
     private void loadKPIs() {
         kpiAppointments.setText("3");
@@ -44,22 +50,40 @@ public class PatientDashboardController {
         kpiTips.setText("12");
     }
 
+    /**
+     * Tải danh sách lịch hẹn của bệnh nhân hiện tại
+     */
     private void loadAppointments() {
-        List<Appointment> data = AppointmentRepository.loadForCurrentUser();
+        ObservableList<Appointment> data = javafx.collections.FXCollections.observableArrayList(
+                appointmentService.getAppointmentsForCurrentUser()
+        );
 
-        colDate.setCellValueFactory(a -> new javafx.beans.property.SimpleStringProperty(
-                a.getValue().getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-        colTime.setCellValueFactory(a -> new javafx.beans.property.SimpleStringProperty(
-                a.getValue().getStart() + " - " + a.getValue().getEnd()));
-        colDoctor.setCellValueFactory(a -> new javafx.beans.property.SimpleStringProperty(a.getValue().getDoctor()));
-        colStatus.setCellValueFactory(a -> new javafx.beans.property.SimpleStringProperty(a.getValue().getStatus().toString()));
+        // Gán dữ liệu vào cột
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        appointmentTable.getItems().setAll(data);
+        colDate.setCellValueFactory(a ->
+                new SimpleStringProperty(a.getValue().getDate().format(dateFormatter))
+        );
+
+        colTime.setCellValueFactory(a ->
+                new SimpleStringProperty(a.getValue().getStart() + " - " + a.getValue().getEnd())
+        );
+
+        colDoctor.setCellValueFactory(a ->
+                new SimpleStringProperty(a.getValue().getDoctor())
+        );
+
+        colStatus.setCellValueFactory(a ->
+                new SimpleStringProperty(a.getValue().getStatus().name())
+        );
+
+        appointmentTable.setItems(data);
     }
+
 
     private void loadHealthChart() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Health Index");
+        series.setName("Chỉ số sức khỏe");
 
         series.getData().add(new XYChart.Data<>("Jan", 75));
         series.getData().add(new XYChart.Data<>("Feb", 78));

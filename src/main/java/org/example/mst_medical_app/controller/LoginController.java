@@ -6,7 +6,7 @@ import org.example.mst_medical_app.core.security.AuthManager;
 import org.example.mst_medical_app.core.utils.SceneManager;
 import org.example.mst_medical_app.core.utils.UserSession;
 import org.example.mst_medical_app.model.UserModel;
-import org.example.mst_medical_app.model.UserRepository;
+import org.example.mst_medical_app.service.UserService;
 
 public class LoginController {
 
@@ -14,17 +14,21 @@ public class LoginController {
     @FXML private PasswordField passwordField;
     @FXML private Label messengerLabel;
 
+    // Gọi Service (nơi xử lý logic đăng nhập)
+    private final UserService userService = new UserService();
+
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText().trim();
+        String usernameOrEmail = usernameField.getText().trim();
         String password = passwordField.getText().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            showMessage("Vui lòng nhập đủ thông tin", "red");
+        if (usernameOrEmail.isEmpty() || password.isEmpty()) {
+            showMessage("Vui lòng nhập đầy đủ thông tin.", "red");
             return;
         }
 
-        UserModel user = UserRepository.checkLogin(username, password);
+        // Gọi Service để xử lý đăng nhập
+        UserModel user = userService.login(usernameOrEmail, password);
 
         if (user == null) {
             showMessage("Sai tài khoản hoặc mật khẩu!", "red");
@@ -34,9 +38,10 @@ public class LoginController {
         // Đăng nhập thành công
         AuthManager.login(user);
         UserSession.setUser(user);
+
         showMessage("Đăng nhập thành công (" + user.getRole() + ")", "green");
 
-        // Chuyển scene theo role
+        // Chuyển scene theo vai trò
         switch (user.getRole().toUpperCase()) {
             case "ADMIN" -> SceneManager.switchScene("/org/example/mst_medical_app/MainLayouts.fxml", "Admin Dashboard");
             case "DOCTOR" -> SceneManager.switchScene("/org/example/mst_medical_app/MainLayouts.fxml", "Doctor Dashboard");
@@ -49,6 +54,7 @@ public class LoginController {
         messengerLabel.setText(message);
         messengerLabel.setStyle("-fx-text-fill: " + color + ";");
     }
+
     @FXML
     private void handleSignUp() {
         SceneManager.switchScene("/org/example/mst_medical_app/SignUpView.fxml", "Sign Up");

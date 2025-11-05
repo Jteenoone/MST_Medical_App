@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
+
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 
-<VBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.mst_medical_app.controller.admin.AppointmentEventPopupController"
-      spacing="10" style="-fx-padding: 18; -fx-background-color:white;">
-    <Label text="Appointment Detail" style="-fx-font-size:18; -fx-font-weight:bold;"/>
-    <Label fx:id="titleLbl"/>
-    <Label fx:id="doctorLbl"/>
-    <Label fx:id="patientLbl"/>
-    <Label fx:id="datetimeLbl"/>
-    <Label fx:id="statusLbl"/>
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.mst_medical_app.controller.admin.AppointmentEventPopupController"
+            prefWidth="400" prefHeight="250"
+            style="-fx-background-color: white; -fx-padding: 20;">
 
-    <Separator/>
+    <VBox spacing="8">
+        <Label fx:id="titleLbl" style="-fx-font-weight: bold; -fx-font-size: 16;"/>
+        <Label fx:id="doctorLbl"/>
+        <Label fx:id="patientLbl"/>
+        <Label fx:id="datetimeLbl"/>
+        <Label fx:id="statusLbl"/>
+        <Label fx:id="notesLbl"/>
 
-    <HBox spacing="8">
-        <Button text="Close" onAction="#close"/>
-        <!-- Nút Edit/Cancel sẽ làm ở bước logic -->
-    </HBox>
-</VBox>
+        <Button text="Close" onAction="#close"
+                style="-fx-background-color: #0D6EFD; -fx-text-fill: white; -fx-background-radius: 6;"
+                prefWidth="100" alignment="CENTER_RIGHT"/>
+    </VBox>
+
+</AnchorPane>

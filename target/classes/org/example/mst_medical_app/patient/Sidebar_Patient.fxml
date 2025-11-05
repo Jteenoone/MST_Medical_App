@@ -10,18 +10,8 @@
 <VBox xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.mst_medical_app.controller.patient.SidebarPatientController"
       prefWidth="250" spacing="140"
-      style="-fx-border-color: #BBBBBB; -fx-border-radius: 5; -fx-border-width: 2;"
       stylesheets="@../../../../styles/sidebar.css">
 
-    <!-- Logo -->
-    <ImageView fitHeight="60" fitWidth="60" preserveRatio="true">
-        <image>
-            <Image url="@../../../../images/medical_icon.png" />
-        </image>
-        <VBox.margin>
-            <Insets left="20" />
-        </VBox.margin>
-    </ImageView>
 
     <!-- Menu Items -->
     <VBox spacing="8">

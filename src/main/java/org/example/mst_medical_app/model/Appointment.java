@@ -1,49 +1,109 @@
 package org.example.mst_medical_app.model;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
+/**
+ * Appointment model – tương thích với toàn bộ controller:
+ * gồm date, start, end, doctor, patient, notes, status...
+ */
 public class Appointment {
 
     public enum Status { PENDING, CONFIRMED, COMPLETED, CANCELED }
-    public enum Type { EXAMINATION, EMERGENCY, FOLLOW_UP }
 
-    private final LocalDate date;
-    private final LocalTime start;
-    private final LocalTime end;
-    private final String title;
-    private final String doctor;
-    private final String patient;
-    private final int doctorId;
-    private final int patientId;
-    private final Status status;
-    private final Type type;
-    private final String color; // hex màu hiển thị event
+    private int appointmentId;
+    private int patientId;
+    private int doctorId;
+    private LocalDateTime appointmentTime;
+    private Status status;
+    private String notes;
 
-    public Appointment(LocalDate date, LocalTime start, LocalTime end,
-                       String title, String doctor,int doctorId,String patient, int patientId,
-                       Status status, Type type, String color) {
-        this.date = date;
-        this.start = start;
-        this.end = end;
-        this.title = title;
-        this.doctor = doctor;
-        this.patient = patient;
-        this.doctorId = doctorId;
+    // optional: thời lượng (phút)
+    private int durationMinutes = 30;
+
+    private String doctorName;
+    private String patientName;
+
+    // --- CONSTRUCTOR ---
+    public Appointment(int appointmentId, int patientId, int doctorId,
+                       LocalDateTime appointmentTime, Status status, String notes) {
+        this.appointmentId = appointmentId;
         this.patientId = patientId;
+        this.doctorId = doctorId;
+        this.appointmentTime = appointmentTime;
         this.status = status;
-        this.type = type;
-        this.color = color;
+        this.notes = notes;
     }
 
-    public LocalDate getDate() { return date; }
-    public LocalTime getStart() { return start; }
-    public LocalTime getEnd() { return end; }
-    public String getTitle() { return title; }
-    public String getDoctor() { return doctor; }
-    public String getPatient() { return patient; }
-    public int getDoctorId() { return doctorId; }
+    // Overload nếu DB trả về status là String
+    public Appointment(int appointmentId, int patientId, int doctorId,
+                       LocalDateTime appointmentTime, String status, String notes) {
+        this(appointmentId, patientId, doctorId, appointmentTime,
+                Status.valueOf(status.toUpperCase()), notes);
+    }
+
+    // --- GETTERS ---
+    public int getAppointmentId() { return appointmentId; }
     public int getPatientId() { return patientId; }
+    public int getDoctorId() { return doctorId; }
+    public LocalDateTime getAppointmentTime() { return appointmentTime; }
     public Status getStatus() { return status; }
-    public Type getType() { return type; }
-    public String getColor() { return color; }
+    public String getNotes() { return notes; }
+
+
+    public String getDoctorName() { return doctorName; }
+    public String getPatientName() { return patientName; }
+
+
+    public String getDoctor() { return doctorName; }
+    public String getPatient() { return patientName; }
+
+    // --- NEW helper methods (cho Calendar & TableView) ---
+    public LocalDate getDate() {
+        return appointmentTime != null ? appointmentTime.toLocalDate() : null;
+    }
+
+    public LocalTime getStart() {
+        return appointmentTime != null ? appointmentTime.toLocalTime() : null;
+    }
+
+    public LocalTime getEnd() {
+        if (appointmentTime == null) return null;
+        if (durationMinutes <= 0) return appointmentTime.toLocalTime();
+        return appointmentTime.plusMinutes(durationMinutes).toLocalTime();
+    }
+
+    // --- FORMAT helpers ---
+    public String getFormattedDate() {
+        return appointmentTime != null ? appointmentTime.toLocalDate().toString() : "";
+    }
+
+    public String getFormattedTime() {
+        if (appointmentTime == null) return "";
+        if (durationMinutes <= 0) return appointmentTime.toLocalTime().toString();
+        return appointmentTime.toLocalTime() + " - " + getEnd();
+    }
+
+    // --- SETTERS ---
+    public void setStatus(Status status) { this.status = status; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+    public void setAppointmentTime(LocalDateTime appointmentTime) { this.appointmentTime = appointmentTime; }
+    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+
+    // --- Duration getter ---
+    public int getDurationMinutes() { return durationMinutes; }
+
+    public LocalDateTime getDateTime() {
+        return appointmentTime;
+    }
+
+    public String getPurpose() {
+        if (notes == null || notes.trim().isEmpty()) {
+            return "Khám bệnh";
+        }
+        return notes;
+    }
 }

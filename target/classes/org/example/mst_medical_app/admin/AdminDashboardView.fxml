@@ -117,11 +117,11 @@
             <Label text="Recent Patiens" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #333;" />
             <TableView fx:id="recentPatientTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
-                  <TableColumn fx:id="nameColumn" text="Name" prefWidth="200"/>
-                  <TableColumn fx:id="ageColumn" text="Age" prefWidth="80"/>
-                  <TableColumn fx:id="genderColumn" text="Gender" prefWidth="100"/>
-                  <TableColumn fx:id="doctorColumn" text="Doctor" prefWidth="200"/>
-                  <TableColumn fx:id="statusColumn" text="Status" prefWidth="150"/>
+                  <TableColumn fx:id="nameColumn" text="Họ tên" prefWidth="180"/>
+                  <TableColumn fx:id="genderColumn" text="Giới tính" prefWidth="100"/>
+                  <TableColumn fx:id="dobColumn" text="Ngày sinh" prefWidth="150"/>
+                  <TableColumn fx:id="addressColumn" text="Địa chỉ" prefWidth="250"/>
+                  <TableColumn fx:id="doctorColumn" text="Bác sĩ phụ trách" prefWidth="150"/>
               </columns>
                <VBox.margin>
                   <Insets />

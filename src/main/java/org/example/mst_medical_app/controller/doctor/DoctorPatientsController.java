@@ -1,5 +1,6 @@
 package org.example.mst_medical_app.controller.doctor;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -7,83 +8,147 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import org.example.mst_medical_app.core.security.AuthManager;
 import org.example.mst_medical_app.model.Patient;
+import org.example.mst_medical_app.service.PatientService;
 
+import java.util.Optional;
+
+/**
+ * Controller cho Bác sĩ quản lý bệnh nhân của mình
+ */
 public class DoctorPatientsController {
 
     @FXML private TableView<Patient> patientsTable;
     @FXML private TableColumn<Patient, String> colName;
-    @FXML private TableColumn<Patient, String> colAge;
     @FXML private TableColumn<Patient, String> colGender;
-    @FXML private TableColumn<Patient, String> colCondition;
-    @FXML private TableColumn<Patient, String> colStatus;
+    @FXML private TableColumn<Patient, String> colDob;
+    @FXML private TableColumn<Patient, String> colAddress;
     @FXML private TableColumn<Patient, Void> colAction;
 
     @FXML private TextField searchField;
-    @FXML private ComboBox<String> statusFilter;
 
-    private ObservableList<Patient> patientsList;
+    private final PatientService patientService = new PatientService();
+    private ObservableList<Patient> masterPatientsList;
 
     @FXML
     public void initialize() {
-        // Lọc demo
-        statusFilter.setItems(FXCollections.observableArrayList("All", "Active", "Recovered", "Critical"));
-        statusFilter.setValue("All");
-
-        // Dữ liệu bệnh nhân mẫu
-        patientsList = FXCollections.observableArrayList(
-                new Patient("San Nguyen", 25, "Female", "Skin Rash", "Active"),
-                new Patient("Tuan Tran", 30, "Male", "Post Surgery", "Recovered"),
-                new Patient("Henry Vu", 40, "Male", "High Fever", "Critical"),
-                new Patient("Mai Linh", 21, "Female", "Acne", "Active")
-        );
-
         setupTable();
+        loadPatients();
 
-        // Gán dữ liệu ban đầu
-        patientsTable.setItems(patientsList);
-
-        // Lọc theo status
-        statusFilter.setOnAction(e -> applyFilter());
-        searchField.textProperty().addListener((obs, old, val) -> applyFilter());
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilter());
     }
 
+    /**
+     * Cấu hình bảng hiển thị
+     */
     private void setupTable() {
-        colName.setCellValueFactory(c -> c.getValue().nameProperty());
-        colAge.setCellValueFactory(c -> c.getValue().ageProperty().asString());
-        colGender.setCellValueFactory(c -> c.getValue().genderProperty());
-        colCondition.setCellValueFactory(c -> c.getValue().conditionProperty());
-        colStatus.setCellValueFactory(c -> c.getValue().statusProperty());
+        colName.setCellValueFactory(cellData -> cellData.getValue().fullNameProperty());
+        colGender.setCellValueFactory(cellData -> cellData.getValue().genderProperty());
+        colDob.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getDateOfBirth() != null)
+                return new ReadOnlyStringWrapper(cellData.getValue().getDateOfBirth().toString());
+            else
+                return new ReadOnlyStringWrapper("-");
+        });
+        colAddress.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
 
+        // Cột hành động
         colAction.setCellFactory(tc -> new TableCell<>() {
-            private final Button viewBtn = new Button("View");
+            private final Button viewBtn = new Button("👁 Xem");
+            private final Button editBtn = new Button("✏ Sửa");
 
             {
                 viewBtn.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-background-radius: 8;");
-                viewBtn.setOnAction(e -> {
-                    Patient p = getTableView().getItems().get(getIndex());
-                    new Alert(Alert.AlertType.INFORMATION,
-                            "Viewing details for " + p.getName() + " (Doctor: " + AuthManager.getFullName() + ")"
-                    ).showAndWait();
-                });
+                editBtn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-background-radius: 8;");
+
+                viewBtn.setOnAction(e -> handleViewPatient(getTableView().getItems().get(getIndex())));
+                editBtn.setOnAction(e -> handleEditPatient(getTableView().getItems().get(getIndex())));
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) setGraphic(null);
-                else setGraphic(new HBox(viewBtn));
+                else setGraphic(new HBox(10, viewBtn, editBtn));
             }
         });
     }
 
-    private void applyFilter() {
-        String text = searchField.getText().toLowerCase().trim();
-        String status = statusFilter.getValue();
+    /**
+     * Tải danh sách bệnh nhân thuộc bác sĩ hiện tại
+     */
+    private void loadPatients() {
+        this.masterPatientsList = patientService.getPatientsForCurrentDoctor();
+        patientsTable.setItems(masterPatientsList);
+    }
 
-        patientsTable.setItems(patientsList.filtered(p ->
-                (status.equals("All") || p.getStatus().equals(status)) &&
-                        (p.getName().toLowerCase().contains(text) ||
-                                p.getCondition().toLowerCase().contains(text))
-        ));
+    /**
+     * Lọc bệnh nhân theo tên hoặc địa chỉ
+     */
+    private void applyFilter() {
+        String searchText = searchField.getText().trim();
+        ObservableList<Patient> filtered = FXCollections.observableArrayList(
+                masterPatientsList.stream()
+                        .filter(p ->
+                                p.getFullName().toLowerCase().contains(searchText.toLowerCase()) ||
+                                        p.getAddress().toLowerCase().contains(searchText.toLowerCase()))
+                        .toList()
+        );
+        patientsTable.setItems(filtered);
+    }
+
+    /**
+     * Xem chi tiết bệnh nhân
+     */
+    private void handleViewPatient(Patient patient) {
+        String info = String.format("""
+                🧍 Họ tên: %s
+                ⚧ Giới tính: %s
+                📅 Ngày sinh: %s
+                🏠 Địa chỉ: %s
+                👨‍⚕️ Bác sĩ phụ trách: %s
+                """,
+                patient.getFullName(),
+                patient.getGender(),
+                patient.getDateOfBirth() != null ? patient.getDateOfBirth() : "-",
+                patient.getAddress(),
+                AuthManager.getFullName()
+        );
+
+        showAlert(Alert.AlertType.INFORMATION, "Thông tin bệnh nhân", info);
+    }
+
+    /**
+     * Sửa địa chỉ bệnh nhân
+     */
+    private void handleEditPatient(Patient patient) {
+        TextInputDialog dialog = new TextInputDialog(patient.getAddress());
+        dialog.setTitle("Cập nhật thông tin bệnh nhân");
+        dialog.setHeaderText("Cập nhật địa chỉ cho " + patient.getFullName());
+        dialog.setContentText("Nhập địa chỉ mới:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newAddress -> {
+            if (newAddress.trim().isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Lỗi", "Địa chỉ không được để trống!");
+                return;
+            }
+
+            patient.setAddress(newAddress);
+            String error = patientService.updatePatientInfo(patient);
+            if (error == null) {
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã cập nhật địa chỉ bệnh nhân!");
+                patientsTable.refresh();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Lỗi", error);
+            }
+        });
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

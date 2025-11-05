@@ -6,9 +6,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox prefHeight="70.0" prefWidth="200.0" spacing="800.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" style="-fx-border-color: #BBBBBB; -fx-border-radius: 5; -fx-border-width: 2;" stylesheets="@../../../../styles/sidebar.css"  fx:controller="org.example.mst_medical_app.controller.components.HeaderController">
+<HBox prefHeight="70.0" prefWidth="200.0" spacing="800.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"  fx:controller="org.example.mst_medical_app.controller.components.HeaderController">
+
     <children>
-      <HBox alignment="CENTER_LEFT" minWidth="-Infinity" prefHeight="100.0" prefWidth="250.0" style="-fx-border-color: #BBBBBB; -fx-border-radius: 5; -fx-border-width: 2;" stylesheets="@../../../../styles/sidebar.css" >
+      <HBox alignment="CENTER_LEFT" minWidth="-Infinity" prefHeight="100.0" prefWidth="250.0" stylesheets="@../../../../styles/sidebar.css" >
          <children>
             <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                <image>

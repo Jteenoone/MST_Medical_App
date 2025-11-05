@@ -1,49 +1,148 @@
 package org.example.mst_medical_app.controller.admin;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import org.example.mst_medical_app.service.ReportService;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
+/**
+ * Controller cho trang Báo cáo (Reports) của Admin.
+ * Hiển thị biểu đồ trạng thái, giới tính, thống kê tháng và tổng KPI.
+ */
 public class ReportsController {
+
     @FXML
-    private PieChart pieChart;
+    private PieChart pieChartStatus;   // Biểu đồ trạng thái cuộc hẹn
+    @FXML
+    private PieChart pieChartGender;   // Biểu đồ giới tính bệnh nhân
     @FXML
     private BarChart<String, Number> barChart;
     @FXML
     private Label totalPatientsLabel, totalAppointmentsLabel, totalRevenueLabel;
 
+    private ReportService reportService;
+
     @FXML
     public void initialize() {
-        loadPieChart();
-        loadBarChart();
+        reportService = new ReportService();
+
+        loadAppointmentStatusChart();
+        loadGenderChart();
+        loadMonthlyBarChart();
         updateSummary();
     }
 
-    private void loadPieChart() {
-        pieChart.getData().addAll(
-                new PieChart.Data("Hoàn thành", 120),
-                new PieChart.Data("Đang chờ", 45),
-                new PieChart.Data("Hủy", 10)
-        );
+    /**
+     * Biểu đồ tròn — Trạng thái các cuộc hẹn
+     */
+    private void loadAppointmentStatusChart() {
+        pieChartStatus.getData().clear();
+        pieChartStatus.setTitle("Trạng thái cuộc hẹn");
+
+        pieChartStatus.getData().addAll(reportService.getAppointmentStatusReport());
+
+        Platform.runLater(() -> {
+            double total = pieChartStatus.getData().stream().mapToDouble(PieChart.Data::getPieValue).sum();
+
+            for (PieChart.Data d : pieChartStatus.getData()) {
+                String color;
+                switch (d.getName().toUpperCase()) {
+                    case "CONFIRMED" -> color = "#3B82F6"; // xanh dương
+                    case "PENDING" -> color = "#FACC15";   // vàng
+                    case "COMPLETED" -> color = "#10B981"; // xanh lá
+                    case "CANCELED" -> color = "#EF4444";  // đỏ
+                    default -> color = "#9CA3AF";          // xám
+                }
+
+                // Gán màu lát bánh
+                d.getNode().setStyle("-fx-pie-color: " + color + ";");
+
+                // Tooltip hiển thị phần trăm
+                double percent = (d.getPieValue() / total) * 100;
+                Tooltip tooltip = new Tooltip(d.getName() + ": " + String.format("%.1f", percent) + "%");
+                Tooltip.install(d.getNode(), tooltip);
+
+                // Đồng bộ màu legend
+                pieChartStatus.lookupAll(".chart-legend-item-symbol").forEach(node -> {
+                    if (node.getParent().toString().contains(d.getName())) {
+                        node.setStyle("-fx-background-color: " + color + ";");
+                    }
+                });
+            }
+        });
     }
 
-    private void loadBarChart() {
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Cuộc hẹn theo tháng");
+    /**
+     * Biểu đồ tròn — Giới tính bệnh nhân
+     */
+    private void loadGenderChart() {
+        if (pieChartGender == null) return;
 
-        series.getData().add(new XYChart.Data<>("Tháng 1", 40));
-        series.getData().add(new XYChart.Data<>("Tháng 2", 60));
-        series.getData().add(new XYChart.Data<>("Tháng 3", 30));
-        series.getData().add(new XYChart.Data<>("Tháng 4", 80));
+        pieChartGender.getData().clear();
+        pieChartGender.setTitle("Tỷ lệ giới tính bệnh nhân");
+
+        pieChartGender.getData().addAll(reportService.getPatientGenderDashboard());
+
+        Platform.runLater(() -> {
+            double total = pieChartGender.getData().stream().mapToDouble(PieChart.Data::getPieValue).sum();
+
+            for (PieChart.Data d : pieChartGender.getData()) {
+                String color;
+                switch (d.getName().toUpperCase()) {
+                    case "NAM" -> color = "#3B82F6";   // xanh dương
+                    case "NỮ" -> color = "#EC4899";   // hồng
+                    case "KHÁC" -> color = "#F59E0B"; // vàng
+                    default -> color = "#9CA3AF";     // xám
+                }
+
+                d.getNode().setStyle("-fx-pie-color: " + color + ";");
+
+                // Tooltip phần trăm
+                double percent = (d.getPieValue() / total) * 100;
+                Tooltip tooltip = new Tooltip(d.getName() + ": " + String.format("%.1f", percent) + "%");
+                Tooltip.install(d.getNode(), tooltip);
+
+                // Đồng bộ màu legend
+                pieChartGender.lookupAll(".chart-legend-item-symbol").forEach(node -> {
+                    if (node.getParent().toString().contains(d.getName())) {
+                        node.setStyle("-fx-background-color: " + color + ";");
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Biểu đồ cột — Số lượng lịch hẹn theo tháng
+     */
+    private void loadMonthlyBarChart() {
+        barChart.getData().clear();
+        barChart.setTitle("Số lượng lịch hẹn theo tháng");
+
+        XYChart.Series<String, Number> series = reportService.getMonthlyAppointmentReport();
+        series.setName("Số cuộc hẹn");
 
         barChart.getData().add(series);
     }
 
+    /**
+     * Hiển thị KPI tổng
+     */
     private void updateSummary() {
-        totalPatientsLabel.setText("Tổng bệnh nhân: 175");
-        totalAppointmentsLabel.setText("Tổng cuộc hẹn: 320");
-        totalRevenueLabel.setText("Doanh thu: 58.000.000đ");
+        int[] kpis = reportService.getDashboardKpiCounts();
+
+        totalPatientsLabel.setText("👥 Tổng bệnh nhân: " + kpis[0]);
+        totalAppointmentsLabel.setText("📅 Tổng cuộc hẹn: " + kpis[2]);
+
+        int revenue = kpis[2] * 180000;
+        String formatted = NumberFormat.getNumberInstance(Locale.US).format(revenue);
+        totalRevenueLabel.setText("💰 Doanh thu: " + formatted + " đ");
     }
 }

@@ -7,8 +7,7 @@
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.mst_medical_app.controller.admin.AppointmentCalendarController"
-      spacing="12" style="-fx-padding: 16;">
-
+      spacing="12" style="-fx-padding: 16; -fx-background-color: transparent;">
 
     <!-- Top Toolbar -->
     <HBox spacing="10" alignment="CENTER_LEFT">
@@ -16,37 +15,56 @@
 
         <Region HBox.hgrow="ALWAYS"/>
 
-        <Button fx:id="prevBtn" text="◀"/>
-
+        <Button fx:id="prevBtn" text="◀"
+                style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;"/>
         <Label fx:id="monthLabel"
                style="-fx-font-size:16; -fx-font-weight:bold; -fx-text-fill:#1f2937;"/>
-
-        <Button fx:id="nextBtn" text="▶"/>
+        <Button fx:id="nextBtn" text="▶"
+                style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;"/>
 
         <ToggleButton fx:id="dayBtn" text="Day"/>
         <ToggleButton fx:id="weekBtn" text="Week"/>
         <ToggleButton fx:id="monthBtn" text="Month" selected="true"/>
     </HBox>
 
-
-    <!-- Legend -->
-    <HBox spacing="14">
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <Label text="●" style="-fx-text-fill:#EF4444; -fx-font-size:14;"/>
-            <Label text="Emergency"/>
+    <!-- Legend Section (4 trạng thái lịch hẹn) -->
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #FACC15; -fx-min-width:10; -fx-min-height:10; -fx-background-radius:50;"/>
+            <Label text="Pending" style="-fx-text-fill:#374151; -fx-font-size:13px;">
+                <tooltip>
+                    <Tooltip text="Đang chờ xác nhận từ bác sĩ"/>
+                </tooltip>
+            </Label>
         </HBox>
 
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <Label text="●" style="-fx-text-fill:#3B82F6; -fx-font-size:14;"/>
-            <Label text="Examination"/>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #3B82F6; -fx-min-width:10; -fx-min-height:10; -fx-background-radius:50;"/>
+            <Label text="Confirmed" style="-fx-text-fill:#374151; -fx-font-size:13px;">
+                <tooltip>
+                    <Tooltip text="Bác sĩ đã xác nhận lịch hẹn"/>
+                </tooltip>
+            </Label>
         </HBox>
 
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <Label text="●" style="-fx-text-fill:#8B5CF6; -fx-font-size:14;"/>
-            <Label text="Follow-up"/>
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #10B981; -fx-min-width:10; -fx-min-height:10; -fx-background-radius:50;"/>
+            <Label text="Completed" style="-fx-text-fill:#374151; -fx-font-size:13px;">
+                <tooltip>
+                    <Tooltip text="Lịch hẹn đã hoàn thành"/>
+                </tooltip>
+            </Label>
+        </HBox>
+
+        <HBox spacing="6" alignment="CENTER_LEFT">
+            <Region style="-fx-background-color: #EF4444; -fx-min-width:10; -fx-min-height:10; -fx-background-radius:50;"/>
+            <Label text="Canceled" style="-fx-text-fill:#374151; -fx-font-size:13px;">
+                <tooltip>
+                    <Tooltip text="Lịch hẹn đã bị hủy"/>
+                </tooltip>
+            </Label>
         </HBox>
     </HBox>
-
 
     <!-- Calendar Container -->
     <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
@@ -58,5 +76,4 @@
             </padding>
         </GridPane>
     </ScrollPane>
-
 </VBox>

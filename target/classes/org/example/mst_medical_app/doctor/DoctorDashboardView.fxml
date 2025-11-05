@@ -30,21 +30,22 @@
     <center>
         <VBox spacing="14" style="-fx-padding: 14;">
 
+
             <!-- KPI Row -->
-            <HBox spacing="12">
-                <VBox alignment="CENTER" prefWidth="280" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
+            <HBox spacing="40.0">
+                <VBox alignment="CENTER" prefWidth="320.0" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
                     <Label style="-fx-text-fill:#64748B;" text="Appointments Today" />
                     <Label fx:id="kpiTodayAppointments" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
                 </VBox>
-                <VBox alignment="CENTER" prefWidth="280" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
+                <VBox alignment="CENTER" prefWidth="320.0" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
                     <Label style="-fx-text-fill:#64748B;" text="New Patients" />
                     <Label fx:id="kpiNewPatients" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
                 </VBox>
-                <VBox alignment="CENTER" prefWidth="280" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
+                <VBox alignment="CENTER" prefWidth="320.0" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
                     <Label style="-fx-text-fill:#64748B;" text="Completed This Week" />
                     <Label fx:id="kpiCompletedWeek" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
                 </VBox>
-                <VBox alignment="CENTER" prefWidth="280" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
+                <VBox alignment="CENTER" prefWidth="320.0" spacing="4" style="-fx-background-color: #FFFFFF; -fx-border-color: #E6EDFA; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 12;">
                     <Label style="-fx-text-fill:#64748B;" text="Satisfaction" />
                     <Label fx:id="kpiSatisfaction" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
                 </VBox>

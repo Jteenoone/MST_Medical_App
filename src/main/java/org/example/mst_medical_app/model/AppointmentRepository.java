@@ -1,38 +1,171 @@
 package org.example.mst_medical_app.model;
 
-import org.example.mst_medical_app.core.security.AuthManager;
+import org.example.mst_medical_app.core.database.DatabaseConnection;
 
-import java.time.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Repository cho bảng appointments trong database medical_app
+ */
 public class AppointmentRepository {
 
-    public static List<Appointment> sample() {
-        LocalDate base = LocalDate.now().withDayOfMonth(1);
-        return List.of(
-                new Appointment(base.plusDays(3),  LocalTime.of(9,0),  LocalTime.of(9,30),  "Hand Infection",        "Dr. Toan",1,   "Akule Vivian", 101, Appointment.Status.CONFIRMED, Appointment.Type.EXAMINATION, "#3B82F6"),
-                new Appointment(base.plusDays(5),  LocalTime.of(11,30),LocalTime.of(12,0),  "Monthly Checkup",       "Dr. DT",2,     "Ola",102,          Appointment.Status.PENDING,   Appointment.Type.FOLLOW_UP,  "#EF4444"),
-                new Appointment(base.plusDays(12), LocalTime.of(8,30), LocalTime.of(17,30), "Malaria Fever",         "Dr. San",3,    "Henry",103,        Appointment.Status.CONFIRMED, Appointment.Type.EMERGENCY,  "#60A5FA"),
-                new Appointment(base.plusDays(16), LocalTime.of(16,0), LocalTime.of(17,0),  "Routine Checkup",       "Dr. San",4,    "Sister Ayo",104,   Appointment.Status.CONFIRMED, Appointment.Type.FOLLOW_UP,  "#F43F5E"),
-                new Appointment(base.plusDays(21), LocalTime.of(8,30), LocalTime.of(9,0),   "Sperm Boost",           "Dr. Tuan",5,   "Mark",105,         Appointment.Status.CONFIRMED, Appointment.Type.EXAMINATION, "#8B5CF6"),
-                new Appointment(base.plusDays(26), LocalTime.of(11,0), LocalTime.of(12,0),  "Ayo's Routine Checkup", "Dr. San",6,    "Sister Ayo",106,   Appointment.Status.CONFIRMED, Appointment.Type.FOLLOW_UP,  "#F43F5E")
+    private Appointment mapRowToAppointment(ResultSet rs) throws SQLException {
+        Appointment appt = new Appointment(
+                rs.getInt("appointment_id"),
+                rs.getInt("patient_id"),
+                rs.getInt("doctor_id"),
+                rs.getTimestamp("appointment_time").toLocalDateTime(),
+                Appointment.Status.valueOf(rs.getString("status").toUpperCase()),
+                rs.getString("notes")
         );
+        try {
+            appt.setDoctorName(rs.getString("doctor_name"));
+            appt.setPatientName(rs.getString("patient_name"));
+        } catch (SQLException ignored) {}
+        return appt;
     }
 
+    /** Lấy tất cả lịch hẹn (Admin xem toàn bộ) */
+    public List<Appointment> findAll() {
+        List<Appointment> list = new ArrayList<>();
+        String sql = """
+            SELECT a.*, 
+                   u1.full_name AS patient_name,
+                   u2.full_name AS doctor_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.patient_id
+            JOIN users u1 ON p.user_id = u1.user_id
+            JOIN doctors d ON a.doctor_id = d.doctor_id
+            JOIN users u2 ON d.user_id = u2.user_id
+            ORDER BY a.appointment_time DESC
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRowToAppointment(rs));
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /** Lấy lịch hẹn của bác sĩ */
+    public List<Appointment> findByDoctorId(int doctorId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = """
+            SELECT a.*, u1.full_name AS patient_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.patient_id
+            JOIN users u1 ON p.user_id = u1.user_id
+            WHERE a.doctor_id = ?
+            ORDER BY a.appointment_time DESC
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapRowToAppointment(rs));
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /** Lấy lịch hẹn của bệnh nhân */
+    public List<Appointment> findByPatientId(int patientId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = """
+            SELECT a.*, u2.full_name AS doctor_name
+            FROM appointments a
+            JOIN doctors d ON a.doctor_id = d.doctor_id
+            JOIN users u2 ON d.user_id = u2.user_id
+            WHERE a.patient_id = ?
+            ORDER BY a.appointment_time DESC
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapRowToAppointment(rs));
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /** Tạo lịch hẹn mới */
+    public boolean create(Appointment appt) {
+        String sql = """
+            INSERT INTO appointments (patient_id, doctor_id, appointment_time, status, notes)
+            VALUES (?, ?, ?, ?, ?)
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, appt.getPatientId());
+            ps.setInt(2, appt.getDoctorId());
+            ps.setTimestamp(3, Timestamp.valueOf(appt.getAppointmentTime()));
+            ps.setString(4, appt.getStatus().toString());
+            ps.setString(5, appt.getNotes());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    /** Cập nhật trạng thái */
+    public boolean updateStatus(int appointmentId, Appointment.Status newStatus) {
+        String sql = "UPDATE appointments SET status = ? WHERE appointment_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus.toString());
+            ps.setInt(2, appointmentId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    /** Lấy tất cả lịch hẹn của người dùng hiện tại (doctor hoặc patient) */
     public static List<Appointment> loadForCurrentUser() {
-        var all = sample();
-        if (AuthManager.isAdmin()) return all;
-
-        var user = AuthManager.getCurUser();
-        if (user == null) return all;
-
-        if (AuthManager.isDoctor()) {
-            return all.stream().filter(a -> a.getDoctorId() == user.getId()).collect(Collectors.toList());
-        }
-        if (AuthManager.isPatient()) {
-            return all.stream().filter(a -> a.getPatientId() == user.getId()).collect(Collectors.toList());
-        }
-        return all;
+        return new AppointmentRepository().findAll();
     }
+    /** Lấy danh sách lịch hẹn sắp tới (thời gian >= hiện tại) cho bác sĩ */
+    public List<Appointment> findByDoctorIdAndFuture(int doctorId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = """
+            SELECT a.*, u1.full_name AS patient_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.patient_id
+            JOIN users u1 ON p.user_id = u1.user_id
+            WHERE a.doctor_id = ? AND a.appointment_time >= NOW()
+            ORDER BY a.appointment_time ASC
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToAppointment(rs));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    /** Lấy danh sách lịch hẹn đã qua (thời gian < hiện tại) cho bác sĩ */
+    public List<Appointment> findByDoctorIdAndPast(int doctorId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = """
+            SELECT a.*, u1.full_name AS patient_name
+            FROM appointments a
+            JOIN patients p ON a.patient_id = p.patient_id
+            JOIN users u1 ON p.user_id = u1.user_id
+            WHERE a.doctor_id = ? AND a.appointment_time < NOW()
+            ORDER BY a.appointment_time DESC
+        """;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToAppointment(rs));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
 }

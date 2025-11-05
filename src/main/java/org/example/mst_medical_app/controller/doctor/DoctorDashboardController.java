@@ -7,6 +7,15 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.mst_medical_app.controller.MainLayoutController;
+import org.example.mst_medical_app.core.security.AuthManager;
+import org.example.mst_medical_app.model.Appointment;
+import org.example.mst_medical_app.model.Patient;
+import org.example.mst_medical_app.service.AppointmentService;
+import org.example.mst_medical_app.service.PatientService;
+import org.example.mst_medical_app.service.ReportService;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class DoctorDashboardController {
 
@@ -38,104 +47,96 @@ public class DoctorDashboardController {
 
     @FXML private Button goPatientsBtn;
 
+    private final PatientService patientService = new PatientService();
+    private final AppointmentService appointmentService = new AppointmentService();
+    private final ReportService reportService = new ReportService();
+
     @FXML
     public void initialize() {
-
+        int doctorId = AuthManager.getCurUser().getId();
 
         // Header
-        welcomeLbl.setText("Welcome, Doctor. How are you feeling today?");
+        welcomeLbl.setText("Welcome back, Dr. " + AuthManager.getFullName());
 
-        // KPIs (demo data)
-        kpiTodayAppointments.setText("8");
-        kpiNewPatients.setText("12");
-        kpiCompletedWeek.setText("26");
-        kpiSatisfaction.setText("95%");
+        // KPIs thật từ DB
+        int todayAppointments = reportService.countTodayAppointments(doctorId);
+        int newPatients = reportService.countNewPatientsThisWeek(doctorId);
+        int completedThisWeek = reportService.countCompletedAppointments(doctorId);
+        int satisfactionRate = reportService.getDoctorSatisfactionRate(doctorId);
 
-        setupCharts();
-        setupRightLists();
-        setupPatientsTable();
+        kpiTodayAppointments.setText(String.valueOf(todayAppointments));
+        kpiNewPatients.setText(String.valueOf(newPatients));
+        kpiCompletedWeek.setText(String.valueOf(completedThisWeek));
+        kpiSatisfaction.setText(satisfactionRate + "%");
+
+        // Dữ liệu biểu đồ + bảng
+        setupCharts(doctorId);
+        setupRightLists(doctorId);
+        setupPatientsTable(doctorId);
     }
 
     /* ----------------- Charts ----------------- */
-    private void setupCharts() {
+    private void setupCharts(int doctorId) {
 
-        // Patients Pie
-        patientsPie.setData(FXCollections.observableArrayList(
-                new PieChart.Data("Men", 48),
-                new PieChart.Data("Women", 50),
-                new PieChart.Data("Children", 2)
-        ));
+        // Biểu đồ giới tính
+        ObservableList<PieChart.Data> genderData = reportService.getPatientGenderStatsForDoctor(doctorId);
+        patientsPie.setData(genderData);
 
-        // Health Line
-        XYChart.Series<String, Number> health = new XYChart.Series<>();
-        health.setName("Health Index");
-        health.getData().add(new XYChart.Data<>("Jun", 60));
-        health.getData().add(new XYChart.Data<>("Jul", 64));
-        health.getData().add(new XYChart.Data<>("Aug", 68));
-        health.getData().add(new XYChart.Data<>("Sep", 70));
-        health.getData().add(new XYChart.Data<>("Oct", 74));
-        health.getData().add(new XYChart.Data<>("Nov", 78));
-        health.getData().add(new XYChart.Data<>("Dec", 82));
+        // Biểu đồ Health (ví dụ theo tháng)
+        XYChart.Series<String, Number> health = reportService.getHealthTrendForDoctor(doctorId);
         healthLine.getData().setAll(health);
 
-        // Overall Appointments
-        XYChart.Series<String, Number> routine = new XYChart.Series<>();
-        routine.setName("Routine");
-        routine.getData().add(new XYChart.Data<>("Apr", 20));
-        routine.getData().add(new XYChart.Data<>("May", 26));
-        routine.getData().add(new XYChart.Data<>("Jun", 22));
-        routine.getData().add(new XYChart.Data<>("Jul", 30));
-        routine.getData().add(new XYChart.Data<>("Aug", 28));
-
-        XYChart.Series<String, Number> exam = new XYChart.Series<>();
-        exam.setName("Examination");
-        exam.getData().add(new XYChart.Data<>("Apr", 14));
-        exam.getData().add(new XYChart.Data<>("May", 18));
-        exam.getData().add(new XYChart.Data<>("Jun", 12));
-        exam.getData().add(new XYChart.Data<>("Jul", 20));
-        exam.getData().add(new XYChart.Data<>("Aug", 16));
-
-        overallBar.getData().setAll(routine, exam);
+        // Biểu đồ tổng cuộc hẹn
+        ObservableList<XYChart.Series<String, Number>> appointmentStats = reportService.getAppointmentTypeStats(doctorId);
+        overallBar.getData().setAll(appointmentStats);
     }
 
     /* --------- Upcoming + Previous Lists --------- */
-    private void setupRightLists() {
+    private void setupRightLists(int doctorId) {
+        List<Appointment> upcoming = appointmentService.findUpcomingAppointmentsByDoctorId(doctorId);
+        List<Appointment> previous = appointmentService.findPreviousAppointmentsByDoctorId(doctorId);
 
-        upcomingList.setItems(FXCollections.observableArrayList(
-                "Tue, Oct 24  •  09:00  •  Laura Bennett (Emergency)",
-                "Mon, Nov 2  •  10:30  •  Ebuka Kelechi (Consultation)",
-                "Fri, Nov 13 •  14:00  •  Bridget Olowojebe (Routine)"
-        ));
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEE, dd MMM  HH:mm");
 
-        previousList.setItems(FXCollections.observableArrayList(
-                "Fri, Aug 18  •  Scott Tam  •  Sick visit",
-                "Tue, Aug 29  •  Annie Ahmed  •  Consultation",
-                "Wed, Aug 30 •  Brian Paul  •  Emergency"
-        ));
+        ObservableList<String> upList = FXCollections.observableArrayList();
+        for (Appointment a : upcoming) {
+            upList.add(a.getDateTime().format(fmt) + " • " + a.getPatientName() + " (" + a.getPurpose() + ")");
+        }
+        upcomingList.setItems(upList);
+
+        ObservableList<String> prevList = FXCollections.observableArrayList();
+        for (Appointment a : previous) {
+            prevList.add(a.getDateTime().format(fmt) + " • " + a.getPatientName() + " • " + a.getPurpose());
+        }
+        previousList.setItems(prevList);
     }
 
     /* ------------- Patients table ---------------- */
-    private void setupPatientsTable() {
-
+    private void setupPatientsTable(int doctorId) {
         colPatientName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
         colChat.setCellValueFactory(new PropertyValueFactory<>("chat"));
         colAction.setCellValueFactory(new PropertyValueFactory<>("action"));
 
-        ObservableList<PatientRow> rows = FXCollections.observableArrayList(
-                new PatientRow("Ibrahim Yakeni", "Male", "Open", "View"),
-                new PatientRow("Bridget Olowojebe", "Female", "Open", "View")
-        );
+        List<Patient> patients = patientService.getPatientsByDoctorId(doctorId);
+        ObservableList<PatientRow> rows = FXCollections.observableArrayList();
+
+        for (Patient p : patients) {
+            rows.add(new PatientRow(
+                    p.getFullName(),
+                    p.getGender(),
+                    "Chat",
+                    "View"
+            ));
+        }
 
         patientsTable.setItems(rows);
 
-        // Go to full Patients page
         goPatientsBtn.setOnAction(e -> {
             if (mainLayoutController != null) {
                 mainLayoutController.setContent("/org/example/mst_medical_app/doctor/DoctorPatients_View.fxml");
-            }
-            else{
-                System.out.println("MainLayoutController is null");
+            } else {
+                System.out.println("⚠ MainLayoutController is null!");
             }
         });
     }
