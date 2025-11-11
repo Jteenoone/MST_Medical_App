@@ -36,9 +36,8 @@ public class AppointmentCalendarController {
         renderMonth();
     }
 
-    /**
-     * Tạo lịch và hiển thị các cuộc hẹn tương ứng với vai trò người dùng
-     */
+     /// Tạo lịch và hiển thị các cuộc hẹn tương ứng với vai trò người dùng
+
     private void renderMonth() {
         calendarGrid.getChildren().clear();
         calendarGrid.getColumnConstraints().clear();
@@ -70,7 +69,7 @@ public class AppointmentCalendarController {
 
         // Tạo từng ô ngày trong lịch
         LocalDate first = currentMonth.atDay(1);
-        int firstDayOfWeek = (first.getDayOfWeek().getValue() + 6) % 7; // Đổi chủ nhật về cuối
+        int firstDayOfWeek = (first.getDayOfWeek().getValue() + 6) % 7;
         LocalDate cursor = first.minusDays(firstDayOfWeek);
 
         for (int r = 1; r <= 6; r++) {
@@ -81,25 +80,25 @@ public class AppointmentCalendarController {
             }
         }
 
-        // ===========================================
-        // 🧠 LOAD LỊCH HẸN THEO ROLE NGƯỜI DÙNG
-        // ===========================================
+        // Load Lịch hẹn theo role
         AppointmentService appointmentService = new AppointmentService();
         List<Appointment> appointments = appointmentService.getAppointmentsForCurrentUser();
 
-        System.out.println(">>> Current user: " + AuthManager.getCurUser().getUsername()
-                + " (" + AuthManager.getCurUser().getRole() + ")");
-        System.out.println(">>> Appointments loaded: " + appointments.size());
-
         // Lọc theo tháng hiện tại
         appointments.stream()
-                .filter(a -> YearMonth.from(a.getAppointmentTime().toLocalDate()).equals(currentMonth))
+                .filter(appt -> {
+                    try {
+                        return appt.getAppointmentTime() != null &&
+                                YearMonth.from(appt.getAppointmentTime().toLocalDate()).equals(currentMonth);
+                    } catch (Exception e) {
+                        System.out.println("⚠ Lỗi date ở appointment ID = " + appt.getAppointmentId());
+                        return false;
+                    }
+                })
                 .forEach(this::addEventToCalendar);
     }
 
-    /**
-     * Tạo một ô trong lịch (một ngày)
-     */
+    // Tạo 1 ô trong lịch
     private VBox createDayCell(LocalDate date, boolean inMonth) {
         VBox cell = new VBox(6);
         cell.setPadding(new Insets(10));
@@ -112,9 +111,7 @@ public class AppointmentCalendarController {
         return cell;
     }
 
-    /**
-     * Thêm "pill" sự kiện lịch hẹn vào đúng ô ngày
-     */
+    // Thêm fill vào đúng ngày
     private void addEventToCalendar(Appointment appt) {
         LocalDate apptDate = appt.getAppointmentTime().toLocalDate();
 
@@ -130,7 +127,7 @@ public class AppointmentCalendarController {
         pill.setAlignment(Pos.CENTER_LEFT);
         pill.setPadding(new Insets(4, 8, 4, 8));
 
-        // 🎨 Màu hiển thị theo trạng thái
+        // Màu hiển thị theo trạng thái
         String color = switch (appt.getStatus()) {
             case PENDING -> "#facc15";
             case CONFIRMED -> "#3b82f6";
@@ -140,7 +137,7 @@ public class AppointmentCalendarController {
         pill.setStyle("-fx-background-radius:10; -fx-background-color:" + color + ";");
         pill.setOnMouseClicked(e -> openEventPopup(appt));
 
-        // 📋 Tên hiển thị trên pill
+        // Tên hiển thị trên pill
         String title;
         if (AuthManager.isDoctor()) {
             // Nếu là bác sĩ → hiển thị tên bệnh nhân
@@ -165,6 +162,7 @@ public class AppointmentCalendarController {
         cell.ifPresent(n -> ((VBox) n).getChildren().add(pill));
     }
 
+    // Mở trang thông tin chi tiết cuộc hẹn
     private void openEventPopup(Appointment appt) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
@@ -176,7 +174,6 @@ public class AppointmentCalendarController {
             org.example.mst_medical_app.controller.admin.AppointmentEventPopupController controller =
                     loader.getController();
             controller.bind(appt);
-
             Stage stage = new Stage();
             stage.setTitle("Appointment Details");
             stage.initModality(Modality.APPLICATION_MODAL);

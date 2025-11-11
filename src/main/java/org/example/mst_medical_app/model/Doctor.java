@@ -2,10 +2,6 @@ package org.example.mst_medical_app.model;
 
 import javafx.beans.property.*;
 
-/**
- * Model cho Bác sĩ (Doctor)
- * Kết hợp dữ liệu từ bảng `doctors` và `users`
- */
 
 public class Doctor {
     private final IntegerProperty doctorId = new SimpleIntegerProperty();
@@ -20,7 +16,7 @@ public class Doctor {
     private final DoubleProperty rating = new SimpleDoubleProperty();
     private final IntegerProperty reviews = new SimpleIntegerProperty();
 
-    // ✅ Constructor đầy đủ
+    // Constructor
     public Doctor() {}
     public Doctor(int doctorId, int userId, String fullName, String specialization,
                   int experienceYears, String licenseNumber,
@@ -33,7 +29,7 @@ public class Doctor {
         this.licenseNumber.set(licenseNumber);
         this.phone.set(phone);
         this.email.set(email);
-        this.status.set("Available"); // mặc định
+        this.status.set("Available");
         this.rating.set(4.5);
         this.reviews.set(0);
     }

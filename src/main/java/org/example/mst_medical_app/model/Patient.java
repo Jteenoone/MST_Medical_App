@@ -9,7 +9,7 @@ public class Patient {
     private final StringProperty gender = new SimpleStringProperty();
     private final ObjectProperty<LocalDate> dateOfBirth = new SimpleObjectProperty<>();
     private final StringProperty address = new SimpleStringProperty();
-
+    public Patient() {}
     public Patient(int id, String fullName, String gender, LocalDate dateOfBirth, String address) {
         this.patientId.set(id);
         this.fullName.set(fullName);
@@ -33,6 +33,8 @@ public class Patient {
     public String getAddress() { return address.get(); }
     public StringProperty addressProperty() { return address; }
 
+    public void setPatientId(int patientId) { this.patientId.set(patientId); }
+    public void setFullName(String fullName) { this.fullName.set(fullName); }
     public void setGender(String gender) { this.gender.set(gender); }
     public void setDateOfBirth(LocalDate date) { this.dateOfBirth.set(date); }
     public void setAddress(String address) { this.address.set(address); }

@@ -39,9 +39,7 @@ public class ReportsController {
         updateSummary();
     }
 
-    /**
-     * Biểu đồ tròn — Trạng thái các cuộc hẹn
-     */
+    // Biểu đồ trạng thái cuộc họp
     private void loadAppointmentStatusChart() {
         pieChartStatus.getData().clear();
         pieChartStatus.setTitle("Trạng thái cuộc hẹn");
@@ -64,7 +62,7 @@ public class ReportsController {
                 // Gán màu lát bánh
                 d.getNode().setStyle("-fx-pie-color: " + color + ";");
 
-                // Tooltip hiển thị phần trăm
+                // Hiển thị phần trăm
                 double percent = (d.getPieValue() / total) * 100;
                 Tooltip tooltip = new Tooltip(d.getName() + ": " + String.format("%.1f", percent) + "%");
                 Tooltip.install(d.getNode(), tooltip);
@@ -79,9 +77,7 @@ public class ReportsController {
         });
     }
 
-    /**
-     * Biểu đồ tròn — Giới tính bệnh nhân
-     */
+    // Biểu đồ giới tính bệnh nhân
     private void loadGenderChart() {
         if (pieChartGender == null) return;
 
@@ -119,9 +115,7 @@ public class ReportsController {
         });
     }
 
-    /**
-     * Biểu đồ cột — Số lượng lịch hẹn theo tháng
-     */
+    // Biểu đồ số lượng cuộc họp theo tháng
     private void loadMonthlyBarChart() {
         barChart.getData().clear();
         barChart.setTitle("Số lượng lịch hẹn theo tháng");
@@ -132,9 +126,7 @@ public class ReportsController {
         barChart.getData().add(series);
     }
 
-    /**
-     * Hiển thị KPI tổng
-     */
+    // KPI tổng
     private void updateSummary() {
         int[] kpis = reportService.getDashboardKpiCounts();
 

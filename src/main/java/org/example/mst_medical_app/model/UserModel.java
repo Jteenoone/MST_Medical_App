@@ -8,6 +8,8 @@ public class UserModel {
     private String phone;
     private String roleName;
 
+    public UserModel() {}
+
     public UserModel(int userId, String username, String fullName, String email,String phone , String roleName) {
         this.userId = userId;
         this.username = username;
@@ -25,6 +27,7 @@ public class UserModel {
     public String getPhone() { return  phone; }
 
 
+    public void setUserId(int userId) { this.userId = userId; }
     public void setRole(String role) {
         this.roleName = role;
     }
@@ -37,5 +40,13 @@ public class UserModel {
     }
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+
+    @Override
+    public String toString() {
+        return fullName != null && !fullName.isEmpty()
+                ? fullName + " (" + email + ")"
+                : username;
     }
 }

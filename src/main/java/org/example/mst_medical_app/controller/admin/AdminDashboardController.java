@@ -33,33 +33,28 @@ public class AdminDashboardController {
 
     @FXML
     public void initialize() {
-        // 1. Khởi tạo Service
+
         this.reportService = new ReportService();
         this.patientService = new PatientService();
         this.appointmentService = new AppointmentService();
 
-        // 2. Tải dữ liệu
         loadKpis();
         loadPatientLineChart();
         loadPatientPieChart();
         loadRecentPatientTable();
     }
 
-    /**
-     * Tải các KPI từ ReportService
-     */
+
     private void loadKpis() {
         int[] kpiCounts = reportService.getDashboardKpiCounts();
 
         patientCountLabel.setText(String.valueOf(kpiCounts[0]));
         prescriptionCountLabel.setText(String.valueOf(kpiCounts[1]));
         appointmentCountLabel.setText(String.valueOf(kpiCounts[2]));
-        revenueLabel.setText("58.000.000đ");
+//        revenueLabel.setText("58.000.000đ");
     }
 
-    /**
-     * Tải biểu đồ Line (thống kê bệnh nhân)
-     */
+     // Tải biểu đồ Line (thống kê bệnh nhân)
     private void loadPatientLineChart() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Patients 2025");
@@ -70,17 +65,13 @@ public class AdminDashboardController {
         patientLineChart.getData().add(series);
     }
 
-    /**
-     * Tải biểu đồ Pie (giới tính bệnh nhân)
-     */
+    // Tải biểu đồ giới tính bệnh nhân
     private void loadPatientPieChart() {
         ObservableList<PieChart.Data> pieData = reportService.getPatientGenderDashboard();
         patientPieChart.setData(pieData);
     }
 
-    /**
-     * Tải bảng Bệnh nhân gần đây
-     */
+     // Tải bảng Bệnh nhân gần đây
     private void loadRecentPatientTable() {
         nameColumn.setCellValueFactory(data -> data.getValue().fullNameProperty());
         genderColumn.setCellValueFactory(data -> data.getValue().genderProperty());
@@ -91,7 +82,16 @@ public class AdminDashboardController {
             else
                 return new ReadOnlyStringWrapper("-");
         });
-        doctorColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper("N/A"));
+        doctorColumn.setCellValueFactory(data -> {
+            int patientID = data.getValue().getPatientId();
+
+            var doctor = appointmentService.getDoctorByPatientId(patientID);
+
+            if(doctor.isEmpty()) {
+                return new ReadOnlyStringWrapper("Chưa khám");
+            }
+            return new ReadOnlyStringWrapper(String.join(", ", doctor));
+        });
 
         ObservableList<Patient> allPatients = patientService.getAllPatients();
         ObservableList<Patient> recentPatients = FXCollections.observableArrayList();

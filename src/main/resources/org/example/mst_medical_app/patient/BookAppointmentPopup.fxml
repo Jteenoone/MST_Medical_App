@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.mst_medical_app.controller.patient.BookAppointmentPopupController"
+      alignment="CENTER" prefWidth="300">
+
+    <DatePicker fx:id="appointmentDatePicker" promptText="Chọn ngày hẹn"/>
+    <ComboBox fx:id="timeSlotCombo" promptText="Chọn khung giờ khả dụng" prefWidth="250"/>
+    <TextArea fx:id="noteField" promptText="Ghi chú (không bắt buộc)" prefHeight="90" prefWidth="250"/>
+
+</VBox>

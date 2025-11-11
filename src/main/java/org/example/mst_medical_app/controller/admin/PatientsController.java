@@ -42,9 +42,7 @@ public class PatientsController {
         editBtn.setOnAction(e -> handleEdit());
     }
 
-    /**
-     * Cấu hình cột TableView
-     */
+     // Cấu hình cột TableView
     private void setupTable() {
         idColumn.setCellValueFactory(data -> data.getValue().patientIdProperty().asObject());
         nameColumn.setCellValueFactory(data -> data.getValue().fullNameProperty());
@@ -58,25 +56,21 @@ public class PatientsController {
         });
     }
 
-    /**
-     * Load toàn bộ bệnh nhân từ DB (chỉ dùng khi refresh)
-     */
+
+    // Load danh sách bệnh nhân
     private void loadPatients() {
         masterList = patientService.getAllPatients();
         patientsTable.setItems(masterList);
-        applyFilter(); // áp dụng filter hiện tại (nếu có)
+        applyFilter();
     }
 
-    /**
-     * Lọc bệnh nhân theo tên hoặc địa chỉ
-     */
+    // Lọc bệnh nhân theo tên hoặc địa chỉ
     private void applyFilter() {
         String keyword = searchField.getText().trim().toLowerCase();
         if (keyword.isEmpty()) {
             patientsTable.setItems(masterList);
             return;
         }
-
         ObservableList<Patient> filtered = FXCollections.observableArrayList(
                 masterList.stream()
                         .filter(p ->
@@ -87,13 +81,11 @@ public class PatientsController {
         patientsTable.setItems(filtered);
     }
 
-    /**
-     * Xóa bệnh nhân được chọn
-     */
+    // Xóa bệnh nhân
     private void handleDelete() {
         Patient selected = patientsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "⚠ Chưa chọn bệnh nhân", "Vui lòng chọn một bệnh nhân để xoá.");
+            showAlert(Alert.AlertType.WARNING, "Chưa chọn bệnh nhân", "Vui lòng chọn một bệnh nhân để xoá.");
             return;
         }
 
@@ -105,21 +97,19 @@ public class PatientsController {
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
             boolean success = patientService.deletePatient(selected);
             if (success) {
-                showAlert(Alert.AlertType.INFORMATION, "✅ Thành công", "Đã xoá bệnh nhân!");
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã xoá bệnh nhân!");
                 loadPatients();
             } else {
-                showAlert(Alert.AlertType.ERROR, "❌ Lỗi", "Không thể xoá bệnh nhân!");
+                showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xoá bệnh nhân!");
             }
         }
     }
 
-    /**
-     * Sửa thông tin bệnh nhân
-     */
+    // Sửa thông tin bệnh nhân
     private void handleEdit() {
         Patient selected = patientsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "⚠ Chưa chọn bệnh nhân", "Vui lòng chọn bệnh nhân để chỉnh sửa.");
+            showAlert(Alert.AlertType.WARNING, "Chưa chọn bệnh nhân", "Vui lòng chọn bệnh nhân để chỉnh sửa.");
             return;
         }
 
@@ -138,17 +128,15 @@ public class PatientsController {
             selected.setAddress(newAddress);
             String error = patientService.updatePatientInfo(selected);
             if (error == null) {
-                showAlert(Alert.AlertType.INFORMATION, "✅ Thành công", "Đã cập nhật thông tin bệnh nhân!");
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã cập nhật thông tin bệnh nhân!");
                 patientsTable.refresh();
             } else {
-                showAlert(Alert.AlertType.ERROR, "❌ Lỗi", error);
+                showAlert(Alert.AlertType.ERROR, "Lỗi", error);
             }
         });
     }
 
-    /**
-     * Hiển thị thông báo
-     */
+    // Hiển thị thông báo
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

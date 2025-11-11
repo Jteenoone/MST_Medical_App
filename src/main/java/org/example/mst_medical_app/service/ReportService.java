@@ -77,7 +77,7 @@ public class ReportService {
         return 0;
     }
 
-    /** Số lịch hẹn đã hoàn thành trong tuần */
+// Số lịch đã hẹn trong tuần
     public int countCompletedAppointments(int doctorId) {
         String sql = """
         SELECT COUNT(*) FROM appointments

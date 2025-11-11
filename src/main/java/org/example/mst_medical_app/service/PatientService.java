@@ -25,7 +25,7 @@ public class PatientService {
         if (user == null || !AuthManager.isDoctor()) {
             return FXCollections.observableArrayList();
         }
-        return patientRepository.findPatientsByDoctorId(user.getId());
+        return patientRepository.findPatientsByDoctorId(getDoctorIdByUserId(user.getId()));
     }
 
     /** Cập nhật thông tin bệnh nhân */
@@ -56,6 +56,21 @@ public class PatientService {
 
     public ObservableList<Patient> getPatientsByDoctorId(int doctorId) {
         return patientRepository.findPatientsByDoctorId(doctorId);
+    }
+
+    private int getDoctorIdByUserId(int userId) {
+        try(var conn = org.example.mst_medical_app.core.database.DatabaseConnection.getConnection();
+        var ps = conn.prepareStatement("SELECT doctor_id FROM doctors WHERE user_id = ?")) {
+            ps.setInt(1,userId);
+            var rs = ps.executeQuery();
+
+            if(rs.next()) {
+                return rs.getInt("doctor_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
 }

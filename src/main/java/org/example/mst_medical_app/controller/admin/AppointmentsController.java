@@ -65,18 +65,14 @@ public class AppointmentsController {
         );
     }
 
-    /**
-     * Tải dữ liệu thật từ DB
-     */
+    // Tải dữ liệu từ DB
     private void loadAppointments() {
         List<Appointment> list = repository.findAll();
         allAppointments = FXCollections.observableArrayList(list);
         appointmentTable.setItems(allAppointments);
     }
 
-    /**
-     * Bộ lọc tìm kiếm theo tên bác sĩ hoặc bệnh nhân
-     */
+    // Bộ lọc tìm kiếm tên bác sỹ hoặc bệnh nhân
     private void setupSearch() {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             String lower = newVal.toLowerCase();
@@ -91,10 +87,7 @@ public class AppointmentsController {
         });
     }
 
-    /**
-     * (Tuỳ chọn) Nút thêm lịch hẹn mới
-     * Có thể mở form riêng để tạo Appointment mới.
-     */
+    // Nút tạo cuộc hẹn mới
     @FXML
     private void handleAddAppointment() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

@@ -35,9 +35,7 @@ public class DoctorsController {
         addDoctorBtn.setOnAction(e -> handleAddDoctor());
     }
 
-    /**
-     * Tải danh sách bác sĩ từ DB
-     */
+    // Tải danh sách bác sỹ từ DB
     private void loadDoctors() {
         doctorContainer.getChildren().clear();
         ObservableList<Doctor> doctors = doctorService.searchDoctors(
@@ -50,9 +48,7 @@ public class DoctorsController {
         }
     }
 
-    /**
-     * Tạo card hiển thị thông tin bác sĩ
-     */
+    // Tạo card thông tin bác sỹ
     private void addDoctorCard(Doctor doctor) {
         Label nameLabel = new Label(doctor.getFullName());
         nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
@@ -73,11 +69,11 @@ public class DoctorsController {
         licenseLabel.setStyle("-fx-text-fill: #444;");
 
         // Nút sửa & xóa
-        Button editBtn = new Button("✏ Edit");
+        Button editBtn = new Button("Edit");
         editBtn.setStyle("-fx-background-color:#3B82F6; -fx-text-fill:white; -fx-background-radius:6;");
         editBtn.setOnAction(e -> handleEditDoctor(doctor));
 
-        Button deleteBtn = new Button("🗑 Delete");
+        Button deleteBtn = new Button("Delete");
         deleteBtn.setStyle("-fx-background-color:#EF4444; -fx-text-fill:white; -fx-background-radius:6;");
         deleteBtn.setOnAction(e -> handleDeleteDoctor(doctor));
 
@@ -104,9 +100,7 @@ public class DoctorsController {
         doctorContainer.getChildren().add(card);
     }
 
-    /**
-     * Thêm bác sĩ mới
-     */
+   // Thêm bác sỹ mới
     private void handleAddDoctor() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Thêm bác sĩ mới");
@@ -140,9 +134,7 @@ public class DoctorsController {
         });
     }
 
-    /**
-     * Chỉnh sửa bác sĩ
-     */
+    // Chỉnh sửa bác Sỹ
     private void handleEditDoctor(Doctor doctor) {
         TextInputDialog dialog = new TextInputDialog(
                 doctor.getSpecialization() + " - " + doctor.getExperienceYears() + " - " + doctor.getLicenseNumber()
@@ -177,9 +169,7 @@ public class DoctorsController {
         });
     }
 
-    /**
-     * Xóa bác sĩ
-     */
+    // Xóa bác sĩ
     private void handleDeleteDoctor(Doctor doctor) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Xóa bác sĩ");

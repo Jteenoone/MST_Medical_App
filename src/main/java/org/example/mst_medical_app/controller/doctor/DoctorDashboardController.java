@@ -55,7 +55,6 @@ public class DoctorDashboardController {
     public void initialize() {
         int doctorId = AuthManager.getCurUser().getId();
 
-        // Header
         welcomeLbl.setText("Welcome back, Dr. " + AuthManager.getFullName());
 
         // KPIs thật từ DB
@@ -75,7 +74,6 @@ public class DoctorDashboardController {
         setupPatientsTable(doctorId);
     }
 
-    /* ----------------- Charts ----------------- */
     private void setupCharts(int doctorId) {
 
         // Biểu đồ giới tính

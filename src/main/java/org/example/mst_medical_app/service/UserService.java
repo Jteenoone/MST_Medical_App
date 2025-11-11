@@ -3,76 +3,43 @@ package org.example.mst_medical_app.service;
 import org.example.mst_medical_app.core.security.AuthManager;
 import org.example.mst_medical_app.model.UserModel;
 import org.example.mst_medical_app.model.UserRepository;
-import org.mindrot.jbcrypt.BCrypt; // <-- YÊU CẦU THƯ VIỆN jbcrypt
+import org.mindrot.jbcrypt.BCrypt;
 
-/**
- * Lớp Service (Nghiệp vụ) - HOÀN CHỈNH & AN TOÀN
- * Xử lý toàn bộ logic nghiệp vụ liên quan đến Người dùng.
- */
+
 public class UserService {
 
     private final UserRepository userRepository;
-    // Độ phức tạp (workload) cho BCrypt (12 là mức an toàn tốt)
-    private final int BCRYPT_WORKLOAD = 12;
-
     public UserService() {
         this.userRepository = new UserRepository();
     }
 
     //======================================================================
-    // LOGIC BĂM & KIỂM TRA MẬT KHẨU (AN TOÀN)
+    // KIỂM TRA MẬT KHẨU (AN TOÀN)
     //======================================================================
-
-    /**
-     * Băm mật khẩu bằng BCrypt (An toàn)
-     */
-    private String hashPassword(String plainTextPassword) {
-        if (plainTextPassword == null || plainTextPassword.isEmpty()) {
-            return "";
-        }
-        return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(BCRYPT_WORKLOAD));
-    }
-
-    /**
-     * Kiểm tra mật khẩu (An toàn)
-     */
-//    private boolean checkPassword(String plainTextPassword, String hashedPassword) {
-//        if (plainTextPassword == null || hashedPassword == null || hashedPassword.isEmpty()) {
-//            return false;
-//        }
-//        try {
-//            return BCrypt.checkpw(plainTextPassword, hashedPassword);
-//        } catch (Exception e) {
-//            return false; // Lỗi nếu hash không hợp lệ
-//        }
-//    }
 
     private boolean checkPassword(String plainTextPassword, String hashedPassword) {
         if (plainTextPassword == null || hashedPassword == null || hashedPassword.isEmpty()) {
             return false;
         }
-
-        // ✅ Cho phép login với mật khẩu chưa mã hóa (dành cho DB cũ)
-        if (plainTextPassword.equals(hashedPassword)) {
-            return true;
-        }
-
-        try {
-            return BCrypt.checkpw(plainTextPassword, hashedPassword);
-        } catch (Exception e) {
-            return false;
-        }
+//        if (plainTextPassword.equals(hashedPassword)) {
+//            return true;
+//        }
+//
+//        try {
+//            return BCrypt.checkpw(plainTextPassword, hashedPassword);
+//        } catch (Exception e) {
+//            return false;
+//        }
+        return plainTextPassword.equals(hashedPassword);
     }
 
 
-    //======================================================================
-    // CHỨC NĂNG ĐĂNG NHẬP / ĐĂNG XUẤT (AN TOÀN)
-    //======================================================================
-
     /**
-     * Xử lý logic đăng nhập an toàn.
-     * Cho phép đăng nhập bằng username HOẶC email.
-     */
+     *CHỨC NĂNG ĐĂNG NHẬP / ĐĂNG XUẤT
+    **/
+
+
+    // Xử lý logic đăng nhập
     public UserModel login(String usernameOrEmail, String password) {
         if (usernameOrEmail == null || usernameOrEmail.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
@@ -86,9 +53,8 @@ public class UserService {
         }
 
         if (loginData == null) {
-            return null; // User/Email không tồn tại
+            return null;
         }
-
         if (checkPassword(password, loginData.getHashedPassword())) {
             UserModel user = loginData.getUserModel();
             AuthManager.login(user);
@@ -102,9 +68,7 @@ public class UserService {
         AuthManager.logOut();
     }
 
-    //======================================================================
     // CHỨC NĂNG ĐĂNG KÝ
-    //======================================================================
 
     public String register(String username, String fullName, String email, String password, String confirm, String role) {
 
@@ -128,10 +92,7 @@ public class UserService {
             return "Vai trò không hợp lệ.";
         }
 
-        String hashedDbPassword = hashPassword(password);
-
-        boolean success = userRepository.createUser(username, hashedDbPassword, fullName, email, roleId);
-
+        boolean success = userRepository.createUser(username, password, fullName, email, roleId);
         if (success) {
             return null; // Thành công
         } else {
@@ -192,9 +153,7 @@ public class UserService {
             return "Mật khẩu cũ không chính xác.";
         }
 
-        String hashedNewPassword = hashPassword(newPassword);
-
-        boolean success = userRepository.updatePassword(currentUser.getId(), hashedNewPassword);
+        boolean success = userRepository.updatePassword(currentUser.getId(), newPassword);
 
         if (success) {
             return null;
@@ -221,7 +180,4 @@ public class UserService {
         return userRepository.findByEmail(email.trim());
     }
 
-    public UserModel getCurrentUserInfo() {
-        return AuthManager.getCurUser();
-    }
 }

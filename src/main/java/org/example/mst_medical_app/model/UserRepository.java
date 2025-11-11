@@ -9,11 +9,6 @@ import java.sql.SQLException;
 
 public class UserRepository {
 
-    /**
-     * LỚP NỘI BỘ
-     * Dùng để trả về cả UserModel VÀ mật khẩu đã băm một cách an toàn
-     * từ Repository lên Service.
-     */
     public static class LoginData {
         private final UserModel userModel;
         private final String hashedPassword;
@@ -27,9 +22,9 @@ public class UserRepository {
         public String getHashedPassword() { return hashedPassword; }
     }
 
-    /**
-     * Lấy dữ liệu đăng nhập (bao gồm cả hash) chỉ bằng USERNAME.
-     */
+
+     //Lấy dữ liệu đăng nhập chỉ bằng USERNAME.
+
     public LoginData getUserDataForLogin(String username) {
         String sql = """
             SELECT u.user_id, u.username, u.full_name, u.email, u.phone_number, 
@@ -54,9 +49,7 @@ public class UserRepository {
         return null;
     }
 
-    /**
-     * Lấy dữ liệu đăng nhập (bao gồm cả hash) chỉ bằng EMAIL.
-     */
+     // Lấy dữ liệu đăng nhập bằng EMAIL.
     public LoginData getUserDataByEmail(String email) {
         String sql = """
             SELECT u.user_id, u.username, u.full_name, u.email, u.phone_number, 
@@ -81,9 +74,8 @@ public class UserRepository {
         return null;
     }
 
-    /**
-     * HÀM HELPER
-     */
+    // Hỗ trợ khởi tạo nhanh
+
     private LoginData mapRowToLoginData(ResultSet rs) throws SQLException {
         UserModel user = new UserModel(
                 rs.getInt("user_id"),
@@ -97,9 +89,7 @@ public class UserRepository {
         return new LoginData(user, hashedPasswordFromDb);
     }
 
-    /**
-     * Cập nhật thông tin hồ sơ (Tên, Email, SĐT)
-     */
+    // Cập nhật thông tin hồ sơ (Tên, Email, SĐT)
     public boolean updateProfile(UserModel user) {
         String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ? WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -117,9 +107,8 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Thêm người dùng mới vào CSDL (dùng cho Đăng ký)
-     */
+
+     // Đăng ký
     public boolean createUser(String username, String hashedPassword, String fullName, String email, int roleId) {
         String sql = "INSERT INTO users (username, password_hash, full_name, email, role_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -138,9 +127,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Kiểm tra xem username đã tồn tại hay chưa
-     */
+    // Kiểm tra xem username đã tồn tại hay chưa
     public boolean findByUsername(String username) {
         String sql = "SELECT 1 FROM users WHERE username = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -155,9 +142,7 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Kiểm tra xem email đã tồn tại hay chưa
-     */
+    // Kiểm tra email tồn tại hay chưa
     public boolean findByEmail(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -172,9 +157,8 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Cập nhật mật khẩu mới cho user
-     */
+
+    // Cập nhật mật khẩu mới cho user
     public boolean updatePassword(int userId, String newHashedPassword) {
         String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();

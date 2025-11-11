@@ -12,6 +12,8 @@ import org.example.mst_medical_app.controller.admin.SidebarAdminController;
 import org.example.mst_medical_app.controller.doctor.SidebarDoctorController;
 import org.example.mst_medical_app.controller.patient.SidebarPatientController;
 import org.example.mst_medical_app.core.security.AuthManager;
+import org.example.mst_medical_app.features.chat.ChatController;
+import org.example.mst_medical_app.features.chat.ChatOpenData;
 
 import java.io.IOException;
 
@@ -19,6 +21,15 @@ public class MainLayoutController {
 
     @FXML private BorderPane rootPane;
     @FXML private StackPane contentArea;
+    private static MainLayoutController instance;
+
+    public MainLayoutController() {
+        instance = this;
+    }
+
+    public static MainLayoutController getInstance() {
+        return instance;
+    }
 
     @FXML
     public void initialize() {
@@ -100,5 +111,29 @@ public class MainLayoutController {
             System.err.println("Lỗi load Content: " + e.getMessage());
         }
     }
+
+    public void setContent(Node node) {
+        contentArea.getChildren().setAll(node);
+    }
+
+    public void loadCenterContent(String fxmlPath, Object data) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node view = loader.load();
+
+            if (data != null && loader.getController() instanceof ChatController chatController) {
+
+                ChatOpenData openData = (ChatOpenData) data;
+                chatController.openConversation(openData.getConversationId(), openData.getDoctor());
+            }
+
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

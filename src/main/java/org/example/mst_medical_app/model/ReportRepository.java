@@ -76,7 +76,7 @@ public class ReportRepository {
     }
 
     /**
-     * Lấy dữ liệu thống kê Lịch hẹn theo tháng (LineChart)
+      Lấy dữ liệu thống kê Lịch hẹn theo tháng (LineChart)
      */
     public XYChart.Series<String, Number> getMonthlyAppointmentStats() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();

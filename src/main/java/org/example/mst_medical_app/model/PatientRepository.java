@@ -53,23 +53,27 @@ public class PatientRepository {
         return list;
     }
 
-    /** 🩺 Lấy danh sách bệnh nhân được gán cho 1 bác sĩ (quan hệ n-n) */
+    /** Lấy danh sách bệnh nhân được gán cho 1 bác sĩ */
     public ObservableList<Patient> findPatientsByDoctorId(int doctorId) {
         ObservableList<Patient> list = FXCollections.observableArrayList();
         String sql = """
-            SELECT p.patient_id, u.full_name, p.gender, p.date_of_birth, p.address
-            FROM patients p
-            JOIN users u ON p.user_id = u.user_id
-            JOIN patient_doctor pd ON p.patient_id = pd.patient_id
-            WHERE pd.doctor_id = ?
-        """;
+        SELECT DISTINCT 
+            p.patient_id, u.full_name, p.gender, p.date_of_birth, p.address
+        FROM patients p
+        JOIN users u ON p.user_id = u.user_id
+        JOIN appointments a ON p.patient_id = a.patient_id
+        WHERE a.doctor_id = ?
+          AND (a.status = 'CONFIRMED' or a.status = 'COMPLETED')
+    """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, doctorId);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRowToPatient(rs));
+                while (rs.next()) {
+                    list.add(mapRowToPatient(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -78,6 +82,8 @@ public class PatientRepository {
 
         return list;
     }
+
+
 
     /** 🩺 Thêm bệnh nhân mới */
     public boolean createPatient(int userId, String gender, String address, java.time.LocalDate dob) {
