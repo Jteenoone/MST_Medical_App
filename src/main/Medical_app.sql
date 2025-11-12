@@ -171,7 +171,7 @@ CREATE TABLE messages (
 );
 
 
-
+-- activity_logsactivity_logsactivity_logsappointments
 -- =========================
 -- 13. DỮ LIỆU MẪU CƠ BẢN
 -- =========================
@@ -305,3 +305,39 @@ SELECT (SELECT COUNT(*) FROM patients),
 SELECT COUNT(*) AS total_users FROM users;
 SELECT COUNT(*) AS total_appointments FROM appointments;
 SELECT * FROM appointments ORDER BY appointment_time LIMIT 5;
+
+CREATE TABLE patient_doctor (
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    assigned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (patient_id, doctor_id),
+    CONSTRAINT fk_patient FOREIGN KEY (patient_id) REFERENCES patients(patient_id) ON DELETE CASCADE,
+    CONSTRAINT fk_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE
+);
+
+use medical_app;
+INSERT INTO patient_doctor (doctor_id, patient_id) VALUES (1, 3);
+
+use medical_app;
+ALTER TABLE messages ADD COLUMN appointment_id INT NULL;
+
+use medical_app;
+ALTER TABLE messages
+ADD COLUMN appointment_status VARCHAR(20) DEFAULT NULL;
+
+use medical_app;
+ALTER TABLE appointments
+MODIFY appointment_time TIME NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+
