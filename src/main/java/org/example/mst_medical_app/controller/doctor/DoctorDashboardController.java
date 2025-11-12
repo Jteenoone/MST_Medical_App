@@ -116,7 +116,7 @@ public class DoctorDashboardController {
         colChat.setCellValueFactory(new PropertyValueFactory<>("chat"));
         colAction.setCellValueFactory(new PropertyValueFactory<>("action"));
 
-        List<Patient> patients = patientService.getPatientsByDoctorId(doctorId);
+        List<Patient> patients = patientService.getPatientsForCurrentDoctor();
         ObservableList<PatientRow> rows = FXCollections.observableArrayList();
 
         for (Patient p : patients) {
@@ -129,12 +129,11 @@ public class DoctorDashboardController {
         }
 
         patientsTable.setItems(rows);
-
         goPatientsBtn.setOnAction(e -> {
             if (mainLayoutController != null) {
                 mainLayoutController.setContent("/org/example/mst_medical_app/doctor/DoctorPatients_View.fxml");
             } else {
-                System.out.println("⚠ MainLayoutController is null!");
+                System.out.println("MainLayoutController is null!");
             }
         });
     }

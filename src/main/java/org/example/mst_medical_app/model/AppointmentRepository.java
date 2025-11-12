@@ -260,4 +260,23 @@ public class AppointmentRepository {
         return list;
     }
 
+    public void save(Appointment appointment) {
+        String sql = "INSERT INTO appointments (doctor_name, patient_name, appointment_time, status, notes) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, appointment.getDoctorName());
+            stmt.setString(2, appointment.getPatientName());
+            stmt.setTimestamp(3, Timestamp.valueOf(appointment.getAppointmentTime()));
+            stmt.setString(4, appointment.getStatus().name());
+            stmt.setString(5, appointment.getNotes());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

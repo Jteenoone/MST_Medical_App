@@ -26,6 +26,7 @@ public class Appointment {
     private String patientName;
 
     // --- CONSTRUCTOR ---
+    public Appointment() {}
     public Appointment(int appointmentId, int patientId, int doctorId,
                        LocalDateTime appointmentTime, Status status, String notes) {
         this.appointmentId = appointmentId;
@@ -59,7 +60,6 @@ public class Appointment {
     public String getDoctor() { return doctorName; }
     public String getPatient() { return patientName; }
 
-    // --- NEW helper methods (cho Calendar & TableView) ---
     public LocalDate getDate() {
         return appointmentTime != null ? appointmentTime.toLocalDate() : null;
     }
