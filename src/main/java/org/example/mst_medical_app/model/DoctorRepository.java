@@ -4,10 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.example.mst_medical_app.core.database.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 
 public class DoctorRepository {
@@ -146,4 +143,64 @@ public class DoctorRepository {
         }
         return doctors;
     }
+
+    public int createDoctorAccount(String username, String password, String fullName) {
+        String sql = """
+        INSERT INTO users (username, password_hash, full_name, role_id)
+        VALUES (?, ?, ?, '2')
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, fullName);
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1); // trả về user_id vừa được tạo
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1; // lỗi → trả về -1
+    }
+
+    public boolean updateDoctorFull(Doctor doctor) {
+        String sql = """
+        UPDATE doctors d
+        JOIN users u ON d.user_id = u.id
+        SET u.full_name = ?, u.email = ?, u.phone_number = ?,
+            d.specialization = ?, d.experience_years = ?, 
+            d.license_number = ?
+        WHERE d.doctor_id = ?
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, doctor.getFullName());
+            ps.setString(2, doctor.getEmail());
+            ps.setString(3, doctor.getPhone());
+            ps.setString(4, doctor.getSpecialization());
+            ps.setInt(5, doctor.getExperienceYears());
+            ps.setString(6, doctor.getLicenseNumber());
+            ps.setInt(8, doctor.getDoctorId());
+
+            int updated = ps.executeUpdate();
+            return updated > 0 ? true : false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

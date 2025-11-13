@@ -57,8 +57,8 @@
                         <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" prefWidth="260"
                                        style="-fx-background-radius: 8; -fx-padding: 8 10;" />
 
-                        <ComboBox fx:id="roleCombo" prefWidth="260" promptText="Select Role"
-                                  style="-fx-background-radius: 8;" />
+<!--                        <ComboBox fx:id="roleCombo" prefWidth="260" promptText="Select Role"-->
+<!--                                  style="-fx-background-radius: 8;" />-->
 
                         <Button fx:id="signupButton" text="Sign Up"
                                 style="-fx-background-color: #0D6EFD; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 16;" />

@@ -126,7 +126,6 @@ public class AppointmentRepository {
 
             ps.setInt(1, patientId);
             ps.setInt(2, doctorId);
-
             ps.setDate(3, java.sql.Date.valueOf(dateTime.toLocalDate()));
             ps.setTime(4, java.sql.Time.valueOf(dateTime.toLocalTime()));
 
@@ -277,6 +276,59 @@ public class AppointmentRepository {
             e.printStackTrace();
         }
     }
+
+    public Appointment.Status getLatestAppointmentStatus(int patientId, int doctorId) {
+        String sql = """
+        SELECT status
+        FROM appointments
+        WHERE patient_id = ? AND doctor_id = ?
+        ORDER BY appointment_time DESC
+        LIMIT 1
+    """;
+
+        try (var conn = DatabaseConnection.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, patientId);
+            ps.setInt(2, doctorId);
+
+            var rs = ps.executeQuery();
+            if (rs.next()) {
+                return Appointment.Status.valueOf(rs.getString("status").toUpperCase());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public String getLatestStatusByPatientId(int patientId) {
+        String sql = """
+        SELECT status
+        FROM appointments
+        WHERE patient_id = ?
+        ORDER BY appointment_date DESC, appointment_time DESC
+        LIMIT 1
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, patientId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("status");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
 
 }

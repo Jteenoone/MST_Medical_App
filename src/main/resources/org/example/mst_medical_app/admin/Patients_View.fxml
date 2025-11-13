@@ -9,34 +9,34 @@
       spacing="15" style="-fx-padding: 20; -fx-background-color: #f9fafb;">
 
     <!-- Tiêu đề -->
-    <Label text="👩‍⚕️ Quản lý bệnh nhân"
+    <Label text="Quản lý bệnh nhân"
            style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e3a8a;" />
 
     <!-- Thanh tìm kiếm và nút hành động -->
     <HBox spacing="10">
         <TextField fx:id="searchField"
-                   promptText="🔍 Tìm theo tên hoặc địa chỉ..."
+                   promptText="Tìm theo tên hoặc địa chỉ..."
                    HBox.hgrow="ALWAYS"
                    style="-fx-background-radius: 8; -fx-padding: 8;" />
 
         <Button fx:id="refreshBtn"
-                text="🔄 Làm mới"
+                text="Làm mới"
                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8;" />
 
         <Button fx:id="editBtn"
-                text="✏ Sửa"
+                text="Sửa"
                 style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8;" />
 
         <Button fx:id="deleteBtn"
-                text="🗑 Xoá"
+                text="Xoá"
                 style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8;" />
     </HBox>
 
     <!-- Bảng hiển thị danh sách bệnh nhân -->
     <TableView fx:id="patientsTable"
-               prefHeight="500"
+               prefHeight="600"
                VBox.vgrow="ALWAYS"
-               style="-fx-background-radius: 10; -fx-border-color: #e5e7eb; -fx-border-radius: 10;">
+               style="-fx-font-size: 16px; -fx-cell-size: 36px; -fx-background-radius: 10; -fx-border-color: #e5e7eb; -fx-border-radius: 10;">
 
         <columns>
             <TableColumn fx:id="idColumn" text="ID" prefWidth="60" />

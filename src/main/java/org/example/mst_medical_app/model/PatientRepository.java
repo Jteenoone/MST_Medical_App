@@ -9,13 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Repository quản lý truy vấn CSDL liên quan đến Bệnh nhân.
- * Cấu trúc bảng:
- *  - patients(patient_id, user_id, gender, date_of_birth, address)
- *  - users(user_id, full_name, email, phone_number)
- *  - patient_doctor(patient_id, doctor_id, assigned_date)
- */
+
 public class PatientRepository {
 
     /** 🧩 Helper: Chuyển ResultSet → Patient object */
@@ -85,7 +79,7 @@ public class PatientRepository {
 
 
 
-    /** 🩺 Thêm bệnh nhân mới */
+    /** Thêm bệnh nhân mới */
     public boolean createPatient(int userId, String gender, String address, java.time.LocalDate dob) {
         String sql = "INSERT INTO patients (user_id, gender, address, date_of_birth) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -107,23 +101,28 @@ public class PatientRepository {
         }
     }
 
-    /** 🩺 Cập nhật thông tin bệnh nhân */
+    /** Cập nhật thông tin bệnh nhân */
     public boolean updatePatient(Patient patient) {
         String sql = """
-            UPDATE patients
-            SET gender = ?, address = ?, date_of_birth = ?
-            WHERE patient_id = ?
+            UPDATE patients p
+            JOIN users u ON p.user_id = u.id
+            SET u.full_name = ?, u.email = ?, u.phone_number = ?,
+                p.date_of_birth = ?, p.gender = ?, p.address = ?
+            WHERE p.patient_id = ?
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, patient.getGender());
-            ps.setString(2, patient.getAddress());
+            ps.setString(1, patient.getFullName());
+            ps.setString(2, patient.getEmail());
+            ps.setString(3, patient.getPhone());;
             if (patient.getDateOfBirth() != null)
-                ps.setDate(3, java.sql.Date.valueOf(patient.getDateOfBirth()));
+                ps.setDate(4, java.sql.Date.valueOf(patient.getDateOfBirth()));
             else
-                ps.setNull(3, java.sql.Types.DATE);
+                ps.setNull(4, java.sql.Types.DATE);
+            ps.setString(5, patient.getGender());
+            ps.setString(6, patient.getAddress());
             ps.setInt(4, patient.getPatientId());
 
             return ps.executeUpdate() > 0;
@@ -183,4 +182,89 @@ public class PatientRepository {
             return false;
         }
     }
+
+    public int countDoctor(int patientId) {
+        String sql = """
+                SELECT COUNT(DISTINCT doctor_id) AS total
+                FROM appointments
+                WHERE patient_id = ?
+                """;
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
+                return rs.getInt("total");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int countAppointment(int patientId) {
+        String sql = """
+                SELECT COUNT(DISTINCT appointment_id) as total
+                FROM appointments
+                WHERE patient_id = ?
+                AND status != 'CANCEL' AND status != 'COMPLETED'
+                """;
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, patientId);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
+                return rs.getInt("total");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public boolean updateMedicalNote(Patient patient) {
+        String sql = "UPDATE patients SET medical_note = ? WHERE patient_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, patient.getMedicalNote());
+            ps.setInt(2, patient.getPatientId());
+
+            int rows = ps.executeUpdate();
+            return rows > 0 ? true :false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getLatestStatusByPatientId(int patientId) {
+        String sql = """
+        SELECT status
+        FROM appointments
+        WHERE patient_id = ?
+        ORDER BY appointment_date DESC, appointment_time DESC
+        LIMIT 1
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, patientId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("status");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+
 }

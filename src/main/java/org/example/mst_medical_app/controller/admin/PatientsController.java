@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import org.example.mst_medical_app.model.Patient;
 import org.example.mst_medical_app.service.PatientService;
@@ -113,28 +114,28 @@ public class PatientsController {
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog(selected.getAddress());
-        dialog.setTitle("Chỉnh sửa địa chỉ");
-        dialog.setHeaderText("Cập nhật địa chỉ cho bệnh nhân: " + selected.getFullName());
-        dialog.setContentText("Nhập địa chỉ mới:");
+        try {
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Edit Patient");
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(newAddress -> {
-            if (newAddress.trim().isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Lỗi", "Địa chỉ không được để trống!");
-                return;
-            }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/org/example/mst_medical_app/admin/EditPatientDialog.fxml"
+            ));
+            dialog.getDialogPane().setContent(loader.load());
+//            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
 
-            selected.setAddress(newAddress);
-            String error = patientService.updatePatientInfo(selected);
-            if (error == null) {
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã cập nhật thông tin bệnh nhân!");
-                patientsTable.refresh();
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Lỗi", error);
-            }
-        });
+            EditPatientDialogController controller = loader.getController();
+            controller.setPatient(selected);
+
+            dialog.showAndWait();
+            loadPatients(); // reload lại bảng sau khi sửa
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể mở form chỉnh sửa.");
+        }
     }
+
 
     // Hiển thị thông báo
     private void showAlert(Alert.AlertType type, String title, String content) {

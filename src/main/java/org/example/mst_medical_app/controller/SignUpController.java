@@ -32,9 +32,8 @@ public class SignUpController {
         String email = emailField.getText().trim();
         String password = passwordField.getText().trim();
         String confirm = confirmPasswordField.getText().trim();
-        String role = roleCombo.getValue();
 
-        if (username.isEmpty() || fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty() || role == null) {
+        if (username.isEmpty() || fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty() ) {
             showMessage("Please fill in all fields.", "red");
             return;
         }
@@ -44,16 +43,17 @@ public class SignUpController {
             return;
         }
 
-        int roleId = switch (role.toUpperCase()) {
-            case "DOCTOR" -> 2;
-            case "PATIENT" -> 1;
-            default -> 0;
-        };
-
-        if (roleId == 0) {
-            showMessage("Invalid role selected.", "red");
-            return;
-        }
+//        int roleId = switch (role.toUpperCase()) {
+//            case "DOCTOR" -> 2;
+//            case "PATIENT" -> 1;
+//            default -> 0;
+//        };
+//
+//        if (roleId == 0) {
+//            showMessage("Invalid role selected.", "red");
+//            return;
+//        }
+        int roleId = 1;
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "INSERT INTO users (username, password_hash, full_name, email, role_id) VALUES (?, ?, ?, ?, ?)";
@@ -67,7 +67,7 @@ public class SignUpController {
             int rows = stmt.executeUpdate();
 
             if (rows > 0) {
-                showMessage("✅ Account created successfully!", "green");
+                showMessage("Account created successfully!", "green");
             } else {
                 showMessage("Failed to create account!", "red");
             }

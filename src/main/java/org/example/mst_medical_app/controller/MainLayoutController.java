@@ -22,6 +22,10 @@ public class MainLayoutController {
     @FXML private BorderPane rootPane;
     @FXML private StackPane contentArea;
     private static MainLayoutController instance;
+    private SidebarAdminController sidebarAdmin;
+    private SidebarPatientController sidebarPatient;
+    private SidebarDoctorController sidebarDoctor;
+
 
     public MainLayoutController() {
         instance = this;
@@ -80,12 +84,15 @@ public class MainLayoutController {
             VBox sidebar = loader.load();
 
             Object controller = loader.getController();
-            if (controller instanceof SidebarAdminController adminSidebar) {
-                adminSidebar.setMainLayoutController(this);
-            } else if (controller instanceof SidebarPatientController patientSidebar) {
-                patientSidebar.setMainLayoutController(this);
-            } else if(controller instanceof SidebarDoctorController doctorSidebar) {
-                doctorSidebar.setMainLayoutController(this);
+            if (controller instanceof SidebarAdminController admin) {
+                sidebarAdmin = admin;
+                admin.setMainLayoutController(this);
+            } else if (controller instanceof SidebarPatientController patient) {
+                sidebarPatient = patient;
+                patient.setMainLayoutController(this);
+            } else if(controller instanceof SidebarDoctorController doctor) {
+                sidebarDoctor = doctor;
+                doctor.setMainLayoutController(this);
             }
             rootPane.setLeft(sidebar);
 
@@ -114,6 +121,18 @@ public class MainLayoutController {
 
     public void setContent(Node node) {
         contentArea.getChildren().setAll(node);
+    }
+
+    public void setActiveSidebar(String key) {
+        if(sidebarAdmin != null) {
+            sidebarAdmin.highlightItem(key);
+        }
+        if(sidebarDoctor != null) {
+            sidebarDoctor.highlightItem(key);
+        }
+        if(sidebarPatient != null) {
+            sidebarPatient.highlightItem(key);
+        }
     }
 
     public void loadCenterContent(String fxmlPath, Object data) {

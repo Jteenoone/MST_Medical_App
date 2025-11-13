@@ -75,6 +75,12 @@ public class SidebarAdminController {
         currentActiveItem = item;
     }
 
+    public void highlightItem(String key) {
+        switch (key) {
+            case "appointments" ->setActive(appointmentItem);
+        }
+    }
+
     @FXML
     private void handleLogout() {
         AuthManager.logOut();

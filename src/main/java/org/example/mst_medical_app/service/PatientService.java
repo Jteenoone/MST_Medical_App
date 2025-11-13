@@ -3,9 +3,9 @@ package org.example.mst_medical_app.service;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.example.mst_medical_app.core.security.AuthManager;
-import org.example.mst_medical_app.model.Patient;
-import org.example.mst_medical_app.model.PatientRepository;
-import org.example.mst_medical_app.model.UserModel;
+import org.example.mst_medical_app.model.*;
+
+import java.time.LocalDate;
 
 /**
  * Service xử lý nghiệp vụ của bệnh nhân.
@@ -13,6 +13,8 @@ import org.example.mst_medical_app.model.UserModel;
 public class PatientService {
 
     private final PatientRepository patientRepository = new PatientRepository();
+    private final AppointmentRepository appointmentRepo = new AppointmentRepository();
+
 
     /** Lấy tất cả bệnh nhân (admin) */
     public ObservableList<Patient> getAllPatients() {
@@ -72,5 +74,39 @@ public class PatientService {
         }
         return -1;
     }
+
+    public int getCountDoctor(int patientId) {
+        return patientRepository.countDoctor(patientId);
+    }
+
+    public int getContAppointment(int patientId) {
+        return patientRepository.countAppointment(patientId);
+    }
+
+    public String updatePatientFull(Patient patient, String fullName, String email, String phone, LocalDate dob, String gender, String address) {
+        if(patient == null)
+            return "không có bệnh nhân này";
+        patient.setFullName(fullName);
+        patient.setEmail(email);
+        patient.setPhone(phone);
+        patient.setDateOfBirth(dob);
+        patient.setGender(gender);
+        patient.setAddress(address);
+        boolean success = patientRepository.updatePatient(patient);
+        return success ? null : "Lỗi khi chỉnh sửa bệnh nhân";
+    }
+
+    public String updateMedicalNote(Patient patient, String note) {
+        if(patient == null)
+            return "Không có bệnhh nhân này";
+        patient.setMedicalNote(note);
+        boolean success = patientRepository.updateMedicalNote(patient);
+        return success ? null : "Lỗi không thể ghi chú";
+    }
+
+
+
+
+
 
 }

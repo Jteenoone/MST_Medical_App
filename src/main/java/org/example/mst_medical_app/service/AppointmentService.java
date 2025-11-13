@@ -100,4 +100,9 @@ public class AppointmentService {
         return repository.updateStatus(appointmentId, Appointment.Status.CONFIRMED);
     }
 
+    public Appointment.Status getLatestStatusForPatient(int patientId, int doctorId) {
+        return repository.getLatestAppointmentStatus(patientId, doctorId);
+    }
+
+
 }

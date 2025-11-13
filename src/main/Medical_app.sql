@@ -330,6 +330,9 @@ use medical_app;
 ALTER TABLE appointments
 MODIFY appointment_time TIME NOT NULL;
 
+use medical_app;
+ALTER TABLE patients ADD COLUMN medical_note TEXT NULL;
+
 
 
 

@@ -29,7 +29,8 @@
         <ToggleButton fx:id="dayBtn"   text="Day"   onAction="#switchToDay"/>
         <ToggleButton fx:id="weekBtn"  text="Week"  onAction="#switchToWeek"/>
         <ToggleButton fx:id="monthBtn" text="Month" selected="true" onAction="#switchToMonth"/>
-
+        <Button fx:id="addAppointmentBtn" text="+ Add Appointment"
+                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 14;"/>
     </HBox>
 
     <!-- Legend Section (4 trạng thái lịch hẹn) -->

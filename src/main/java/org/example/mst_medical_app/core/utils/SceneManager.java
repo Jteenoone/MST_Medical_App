@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.geometry.Rectangle2D;
+import org.example.mst_medical_app.Main;
 import org.example.mst_medical_app.controller.MainLayoutController;
 import org.example.mst_medical_app.features.chat.ChatController;
 import org.example.mst_medical_app.features.chat.ChatOpenData;
@@ -66,8 +67,6 @@ public class SceneManager {
 
         ChatController controller = loader.getController();
         controller.openConversation(conversationId, doctor);
-
-        // ✅ Lấy MainLayoutController và thay phần content bằng ChatView
         MainLayoutController.getInstance().setContent(view);
     }
 

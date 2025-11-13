@@ -85,9 +85,25 @@ public class DoctorService {
         return success ? null : "Cập nhật thất bại! (Lỗi CSDL)";
     }
 
+    public String updateDoctorFull(Doctor doctor,  String fullName, String email, String phone, String spec, int exp, String license) {
+        if(doctor == null)
+            return "Bác sỹ không hợp lệ";
+        doctor.setFullName(fullName);
+        doctor.setEmail(email);
+        doctor.setPhone(phone);
+        doctor.setSpecialization(spec);
+        doctor.setExperienceYears(exp);
+        doctor.setLicenseNumber(license);
+        boolean success = doctorRepository.updateDoctorFull(doctor);
+        return success ? null : "Câph nhật thất bại";
+    }
     // Xóa bác sĩ
     public boolean deleteDoctor(Doctor doctor) {
         if (doctor == null) return false;
         return doctorRepository.deleteDoctor(doctor.getDoctorId());
+    }
+
+    public int createDoctorAccount(String username, String password, String fullName) {
+        return doctorRepository.createDoctorAccount(username, password, fullName);
     }
 }

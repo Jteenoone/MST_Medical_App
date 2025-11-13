@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12" alignment="CENTER"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.mst_medical_app.controller.admin.EditDoctorDialogController">
+
+    <padding>
+        <Insets top="20" bottom="20" left="20" right="20"/>
+    </padding>
+
+    <Label text="Edit Doctor Information"
+           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="fullNameField" promptText="Full name"/>
+    <TextField fx:id="emailField" promptText="Email"/>
+    <TextField fx:id="phoneField" promptText="Phone"/>
+    <ComboBox fx:id="specializationBox" promptText="Specialization"/>
+    <TextField fx:id="expField" promptText="Experience Years"/>
+    <TextField fx:id="licenseField" promptText="License Number"/>
+    <ComboBox fx:id="statusBox" promptText="Status"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel"
+                onAction="#onCancel"
+                style="-fx-background-color: #d5d5d5; -fx-text-fill: black;"/>
+
+        <Button text="Save"
+                onAction="#onSave"
+                style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+</VBox>

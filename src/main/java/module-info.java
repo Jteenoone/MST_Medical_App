@@ -4,6 +4,7 @@ module org.example.mst_medical_app {
     requires javafx.graphics;
     requires java.sql;
     requires jbcrypt;
+    requires jdk.jdi;
 
     opens org.example.mst_medical_app to javafx.fxml;
     exports org.example.mst_medical_app;
@@ -23,4 +24,5 @@ module org.example.mst_medical_app {
     opens org.example.mst_medical_app.features.chat to javafx.fxml;
     exports  org.example.mst_medical_app.features.settings;
     opens org.example.mst_medical_app.features.settings to javafx.fxml;
+    opens org.example.mst_medical_app.model to javafx.base;
 }

@@ -69,6 +69,12 @@ public class SidebarPatientController {
         currentActiveItem = item;
     }
 
+    public void highlightItem(String key) {
+        switch (key) {
+            case "appointments" ->setActive(appointmentItem);
+            case "chats" ->setActive(chatItem);
+        }
+    }
     @FXML
     private void handleLogout() {
         AuthManager.logOut();

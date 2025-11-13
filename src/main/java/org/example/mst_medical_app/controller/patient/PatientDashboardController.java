@@ -7,8 +7,12 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import org.example.mst_medical_app.controller.MainLayoutController;
+import org.example.mst_medical_app.core.security.AuthManager;
 import org.example.mst_medical_app.model.Appointment;
+import org.example.mst_medical_app.model.PatientRepository;
+import org.example.mst_medical_app.model.UserModel;
 import org.example.mst_medical_app.service.AppointmentService;
+import org.example.mst_medical_app.service.PatientService;
 
 import java.time.format.DateTimeFormatter;
 
@@ -23,6 +27,7 @@ public class PatientDashboardController {
 
     private MainLayoutController mainLayoutController;
     private final AppointmentService appointmentService = new AppointmentService();
+    private final PatientService patientService = new PatientService();
 
     public void setMainLayoutController(MainLayoutController controller) {
         this.mainLayoutController = controller;
@@ -37,6 +42,7 @@ public class PatientDashboardController {
         // Gắn sự kiện cho nút xem tất cả cuộc hẹn
         viewAllAppointmentsBtn.setOnAction(e -> {
             if (mainLayoutController != null) {
+                mainLayoutController.setActiveSidebar("appointments");
                 mainLayoutController.setContent("/org/example/mst_medical_app/admin/Appointments_Calendar_View.fxml");
             }
         });
@@ -44,15 +50,13 @@ public class PatientDashboardController {
 
 
     private void loadKPIs() {
-        kpiAppointments.setText("3");
-        kpiDoctors.setText("4");
+        kpiAppointments.setText(String.valueOf(patientService.getContAppointment(AuthManager.getCurUser().getId())));
+        kpiDoctors.setText(String.valueOf(patientService.getCountDoctor(AuthManager.getCurUser().getId())));
         kpiMessages.setText("5");
         kpiTips.setText("12");
     }
 
-    /**
-     * Tải danh sách lịch hẹn của bệnh nhân hiện tại
-     */
+
     private void loadAppointments() {
         ObservableList<Appointment> data = javafx.collections.FXCollections.observableArrayList(
                 appointmentService.getAppointmentsForCurrentUser()

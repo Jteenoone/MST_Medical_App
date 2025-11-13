@@ -52,7 +52,7 @@ public class SidebarDoctorController {
                 "/org/example/mst_medical_app/features/settings/SettingView.fxml");
     }
 
-    /** Bind both HBox and Button to navigate + highlight **/
+
     private void bindNav(HBox item, Button btn, String fxml) {
         Runnable go = () -> {
             if (mainLayoutController == null) return;
@@ -64,7 +64,6 @@ public class SidebarDoctorController {
         btn.setOnAction(e -> go.run());
     }
 
-    /** Highlight active item */
     private void setActive(HBox item) {
         if (currentActiveItem != null) {
             currentActiveItem.getStyleClass().remove("sidebar-item-active");
@@ -75,6 +74,13 @@ public class SidebarDoctorController {
         }
 
         currentActiveItem = item;
+    }
+
+    public void highlightItem(String key) {
+        switch (key) {
+            case "appointments" ->setActive(appointmentItem);
+            case "chats" ->setActive(chatItem);
+        }
     }
 
     @FXML

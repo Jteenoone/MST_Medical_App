@@ -39,7 +39,7 @@ public class BookAppointmentPopupController {
         List<LocalTime> bookedSlots =
                 appointmentRepository.getBookedTimesForDoctor(doctorId, date);
 
-        // Danh sách slot (tuỳ bạn muốn thêm bao nhiêu)
+        // Danh sách slot
         List<LocalTime> allSlots = List.of(
                 LocalTime.of(8, 0),
                 LocalTime.of(9, 0),
@@ -50,7 +50,7 @@ public class BookAppointmentPopupController {
         );
 
         allSlots.stream()
-                .filter(slot -> !bookedSlots.contains(slot)) // chỉ lấy giờ chưa bận
+                .filter(slot -> !bookedSlots.contains(slot))
                 .map(LocalTime::toString)
                 .forEach(timeSlotCombo.getItems()::add);
     }

@@ -73,7 +73,7 @@ public class DoctorsController {
     }
 
     /**
-     * Tải danh sách bác sĩ từ CSDL (qua DoctorService)
+     * Tải danh sách bác sĩ từ CSDL
      */
     private void loadDoctors() {
         doctorContainer.getChildren().clear();
@@ -167,7 +167,6 @@ public class DoctorsController {
 
             dialog.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-
                     BookAppointmentPopupController popup = loader.getController();
                     LocalDateTime selectedDateTime = popup.getSelectedDateTime();
                     String notes = popup.getNote();
@@ -178,7 +177,7 @@ public class DoctorsController {
                     }
 
                     int patientId = AuthManager.getCurUser().getId();
-                    int doctorId = doctor.getDoctorId();  // doctor_id (not user_id)
+                    int doctorId = doctor.getDoctorId();
 
                     // === 2. Book appointment ===
                     Integer appointmentId = appointmentService.bookAppointment(
@@ -188,10 +187,10 @@ public class DoctorsController {
                             notes
                     );
                     if (appointmentId == null) {
-                        showError("⛔ Bác sĩ đã có lịch vào thời điểm này, vui lòng chọn giờ khác.");
+                        showError("Bác sĩ đã có lịch vào thời điểm này, vui lòng chọn giờ khác.");
                         return;
                     }
-                    showSuccess("✅ Đặt lịch thành công! Tin nhắn xác nhận đã gửi cho bác sĩ.");
+                    showSuccess("Đặt lịch thành công! Tin nhắn xác nhận đã gửi cho bác sĩ.");
 
                     // === 3. Tạo tin nhắn chat có appointmentId ===
                     int doctorUserId = doctor.getUserId();
@@ -206,7 +205,7 @@ public class DoctorsController {
                     int conversationId = chatService.createOrGetConversation(patientId, doctorUserId);
 
                     String msg = """
-                        📅 Bệnh nhân đã đặt lịch khám.
+                        Bệnh nhân đã đặt lịch khám.
                         • Ngày: %s
                         • Giờ: %s
                         • Ghi chú: %s
@@ -216,7 +215,7 @@ public class DoctorsController {
                             (notes == null || notes.isEmpty()) ? "Không có ghi chú" : notes
                     );
 
-                    // ⭐ Gửi message có appointmentId & status = PENDING
+                    // Gửi message có appointmentId & status = PENDING
                     Message message = new Message();
                     message.setConversationId(conversationId);
                     message.setSenderId(patientId);
@@ -229,8 +228,6 @@ public class DoctorsController {
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
-
-                    // === Mở cửa sổ chat luôn ===
                     try {
                         SceneManager.openChat(conversationId, doctor);
                     } catch (IOException e) {
@@ -245,14 +242,9 @@ public class DoctorsController {
         }
     }
 
-    /** ✅ đóng popup sau khi đặt lịch */
-    private void closeWindow() {
-        Stage stage = (Stage) appointmentDatePicker.getScene().getWindow();
-        stage.close();
-    }
 
 
-    /** ✅ Thông báo lỗi */
+    // Thông báo lỗi
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText(null);
@@ -260,7 +252,7 @@ public class DoctorsController {
         alert.showAndWait();
     }
 
-    /** ✅ Thông báo thành công */
+    // Thông báo thành công
     private void showSuccess(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
@@ -268,11 +260,4 @@ public class DoctorsController {
         alert.showAndWait();
     }
 
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }

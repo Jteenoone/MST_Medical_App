@@ -9,6 +9,10 @@ public class Patient {
     private final StringProperty gender = new SimpleStringProperty();
     private final ObjectProperty<LocalDate> dateOfBirth = new SimpleObjectProperty<>();
     private final StringProperty address = new SimpleStringProperty();
+    private final StringProperty email = new SimpleStringProperty();
+    private final StringProperty phone = new SimpleStringProperty();
+    private StringProperty appointmentStatus = new SimpleStringProperty("Chưa có");
+    private StringProperty medicalNote = new SimpleStringProperty("");
     public Patient() {}
     public Patient(int id, String fullName, String gender, LocalDate dateOfBirth, String address) {
         this.patientId.set(id);
@@ -29,6 +33,23 @@ public class Patient {
 
     public LocalDate getDateOfBirth() { return dateOfBirth.get(); }
     public ObjectProperty<LocalDate> dateOfBirthProperty() { return dateOfBirth; }
+
+    public String getEmail() { return email.get(); }
+    public StringProperty emailProperty() { return email; }
+    public void setEmail(String email) { this.email.set(email); }
+
+    public String getPhone() { return phone.get(); }
+    public StringProperty phoneProperty() { return phone; }
+    public void setPhone(String phone) { this.phone.set(phone); }
+
+    public String getAppointmentStatus() { return appointmentStatus.get(); }
+    public void setAppointmentStatus(String status) { this.appointmentStatus.set(status); }
+    public StringProperty appointmentStatusProperty() { return appointmentStatus; }
+
+
+    public String getMedicalNote() { return medicalNote.get(); }
+    public void setMedicalNote(String note) { this.medicalNote.set(note); }
+    public StringProperty medicalNoteProperty() { return medicalNote; }
 
     public String getAddress() { return address.get(); }
     public StringProperty addressProperty() { return address; }
